@@ -811,7 +811,6 @@ const MainFeature = ({ addNewBooking }) => {
                             </div>
                           </div>
                         </div>
-                      </motion.div>
                         <div className="flex justify-between mt-8">
                           <button
                             type="button"
@@ -821,14 +820,13 @@ const MainFeature = ({ addNewBooking }) => {
                             Back
                           </button>
                           <button
-                            type="submit" 
                             className="btn-primary py-2.5 px-6 group"
                           >
                             Continue to Preferences & Payment
                             <CgArrowLongRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                           </button>
                       </motion.div>
-                      </motion.div>
+                        </div>
                     )}
                     
                     {/* Step 4: Preferences & Payment */}
