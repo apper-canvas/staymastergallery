@@ -43,9 +43,19 @@ export default {
       },
       borderRadius: {
         'xl': '0.75rem',
-        '2xl': '1rem'
+        '2xl': '1rem',
+        'pill': '9999px'
+      },
+      animation: {
+        'bounce-slow': 'bounce 3s infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'slide-right': 'slideRight 0.5s ease-out',
+        'scale-up': 'scaleUp 0.3s ease-out',
+        'spin-slow': 'spin 3s linear infinite'
       }
-    }
+    },
   },
   plugins: [],
   darkMode: 'class',

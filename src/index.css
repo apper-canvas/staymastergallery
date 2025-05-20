@@ -98,6 +98,61 @@
   .container-custom {
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
+  
+  /* Multi-step form styles */
+  .step-indicator {
+    @apply w-10 h-10 rounded-full flex items-center justify-center border-2 
+           transition-colors duration-300 text-lg font-semibold;
+  }
+  
+  .step-indicator-active {
+    @apply border-primary bg-primary text-white shadow-md;
+  }
+  
+  .step-indicator-completed {
+    @apply border-secondary bg-secondary text-white;
+  }
+  
+  .step-indicator-inactive {
+    @apply border-surface-300 bg-white text-surface-400
+           dark:border-surface-600 dark:bg-surface-800 dark:text-surface-500;
+  }
+  
+  .step-connector {
+    @apply h-1 flex-grow mx-2 rounded-full bg-surface-200 dark:bg-surface-700 transition-colors duration-300;
+  }
+  
+  .step-connector-active {
+    @apply bg-secondary;
+  }
+  
+  /* Room selector cards */
+  .room-card {
+    @apply relative border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer;
+  }
+  
+  .room-card-selected {
+    @apply border-primary ring-2 ring-primary/20 shadow-md transform -translate-y-1;
+  }
+  
+  .room-card-badge {
+    @apply absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-medium;
+  }
+  
+  /* Date picker customization */
+  .react-datepicker-wrapper {
+    @apply w-full;
+  }
+  
+  .react-datepicker {
+    @apply border border-surface-200 rounded-lg shadow-lg !important;
+  }
+  
+  .react-datepicker__day--selected,
+  .react-datepicker__day--in-selecting-range,
+  .react-datepicker__day--in-range {
+    @apply bg-primary !important;
+  }
 }
 
 @layer utilities {
@@ -116,7 +171,45 @@
   .shadow-neu-dark {
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3), -5px -5px 15px rgba(255, 255, 255, 0.05);
   }
+  
+  /* Animated background */
+  .bg-gradient-animated {
+    background-size: 200% 200%;
+    animation: gradient 5s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Form animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes slideRight {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes scaleUp {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
 }
 
 /* Import react-toastify styles */
 @import 'react-toastify/dist/ReactToastify.css';
+
+/* Import react-datepicker styles */
+@import 'react-datepicker/dist/react-datepicker.css';
+
+
