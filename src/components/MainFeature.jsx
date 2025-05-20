@@ -715,7 +715,6 @@ const MainFeature = ({ addNewBooking }) => {
                         <div className="bg-white dark:bg-surface-800 rounded-xl overflow-hidden border border-surface-200 dark:border-surface-700 shadow-lg">
                           <div className="bg-gradient-to-r from-primary/20 to-secondary/20 dark:from-primary/40 dark:to-secondary/40 py-5 px-6">
                             <h4 className="text-lg font-semibold text-surface-900 dark:text-white">Reservation Summary</h4>
-                      </h4>
                           </div>
                           
                           <div className="p-6">
