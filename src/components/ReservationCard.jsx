@@ -59,11 +59,13 @@ const ReservationCard = ({ reservation, onCheckIn, onCheckOut }) => {
           <h3 className="text-lg font-semibold text-surface-900 dark:text-white mt-1">
             {reservation.roomType} - Room {reservation.roomNumber}
           </h3>
-          <div className="flex items-center text-sm text-surface-600 dark:text-surface-400 mt-1">
+          <div className="flex items-center text-sm mt-2">
             <CalendarIcon className="h-4 w-4 mr-1" />
-            <span>
-              {formatDate(reservation.checkInDate)} - {formatDate(reservation.checkOutDate)}
-            </span>
+            <div className="flex items-center">
+              <span className="bg-surface-200 dark:bg-surface-600 px-2 py-1 rounded text-surface-900 dark:text-white font-medium text-sm">
+                {formatDate(reservation.checkInDate)}
+              </span> <span className="mx-1 text-surface-600 dark:text-surface-400">-</span> <span className="bg-surface-200 dark:bg-surface-600 px-2 py-1 rounded text-surface-900 dark:text-white font-medium text-sm">{formatDate(reservation.checkOutDate)}</span>
+            </div>
           </div>
         </div>
         <div className="flex space-x-2">

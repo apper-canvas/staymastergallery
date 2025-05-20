@@ -150,7 +150,7 @@ const CheckInOutModal = ({ isOpen, onClose, reservation, mode, onSubmit }) => {
                 {reservation.roomType} - Room {reservation.roomNumber}
               </p>
               <p className="text-xs text-surface-600 dark:text-surface-400 mt-1">
-                {format(new Date(reservation.checkInDate), 'MMM dd, yyyy')} - {format(new Date(reservation.checkOutDate), 'MMM dd, yyyy')}
+                <span className="inline-block bg-surface-200 dark:bg-surface-600 px-2 py-1 rounded text-surface-900 dark:text-white font-medium">{format(new Date(reservation.checkInDate), 'MMM dd, yyyy')}</span> <span className="mx-1">-</span> <span className="inline-block bg-surface-200 dark:bg-surface-600 px-2 py-1 rounded text-surface-900 dark:text-white font-medium">{format(new Date(reservation.checkOutDate), 'MMM dd, yyyy')}</span>
               </p>
             </div>
 
