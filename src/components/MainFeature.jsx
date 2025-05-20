@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { format, addDays } from 'date-fns';
 import { toast } from 'react-toastify';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
 import { FaBed, FaUsers, FaRegCalendarCheck, FaConciergeBell, FaWifi, 
@@ -135,6 +136,8 @@ const MainFeature = ({ addNewBooking }) => {
   };
   
   const handleInputChange = (e) => {
+    setErrors({});
+    
     const { name, value } = e.target;
     setReservationData(prev => ({
       ...prev,
@@ -435,7 +438,8 @@ const MainFeature = ({ addNewBooking }) => {
                               </div>
                               
                               <div className="mb-4">
-                                <label className="label">Check-in & Check-out</label>
+                                <label className="label" htmlFor="dateRange">Check-in & Check-out</label>
+                                <div className="relative">
                                 <div className="relative">
                                   <div className="relative focus-within:ring-2 focus-within:ring-primary focus-within:border-primary rounded-lg overflow-hidden">
                                     <div 
@@ -460,6 +464,7 @@ const MainFeature = ({ addNewBooking }) => {
                                       selectsRange={true}
                                       startDate={startDate}
                                       endDate={endDate}
+                                      id="dateRange"
                                       onChange={(update) => {
                                         setDateRange(update);
                                         // Directly update the reservation data when dates change
@@ -467,7 +472,7 @@ const MainFeature = ({ addNewBooking }) => {
                                         if (newStartDate) {
                                           setReservationData(prev => ({
                                             ...prev,
-                                            checkInDate: newStartDate.toISOString().split('T')[0]
+                                            checkInDate: newStartDate.toISOString().split('T')[0],
                                           }));
                                         }
                                         if (newEndDate) {
@@ -485,7 +490,8 @@ const MainFeature = ({ addNewBooking }) => {
                                     />
                                   </div>
                                   <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
-                                </div>
+                                  </div>
+                                 </div>
                                 {errors.dates && <p className="mt-1 text-sm text-red-500">{errors.dates}</p>}
                               </div>
                               
@@ -694,9 +700,9 @@ const MainFeature = ({ addNewBooking }) => {
                                   </div>
                                 </div>
                       </div>
-                      </div>
-                      </div>
-                    </div>
+                             </div>
+                           </div>
+                         </div>
                         
                         <div className="flex justify-between mt-8">
                           <button
@@ -899,7 +905,7 @@ const MainFeature = ({ addNewBooking }) => {
                         </div>
                       </div>
                     </motion.div>
-                  )}
+                  )} 
                 </form>
               </div>
             </motion.div>
