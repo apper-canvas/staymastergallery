@@ -449,16 +449,35 @@ const MainFeature = ({ addNewBooking }) => {
                               <div className="mb-4">
                                 <label className="label">Check-in & Check-out</label>
                                 <div className="relative">
-                                  <DatePicker
-                                    selectsRange={true}
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    onChange={(update) => setDateRange(update)}
-                                    minDate={today}
-                                    monthsShown={window.innerWidth > 768 ? 2 : 1}
-                                    className="input py-3 pl-9"
-                                    placeholderText="Select date range"
-                                  />
+                                  <div className="relative focus-within:ring-2 focus-within:ring-primary focus-within:border-primary rounded-lg overflow-hidden">
+                                    <DatePicker
+                                      selectsRange={true}
+                                      startDate={startDate}
+                                      endDate={endDate}
+                                      onChange={(update) => {
+                                        setDateRange(update);
+                                        // Directly update the reservation data when dates change
+                                        const [newStartDate, newEndDate] = update;
+                                        if (newStartDate) {
+                                          setReservationData(prev => ({
+                                            ...prev,
+                                            checkInDate: newStartDate.toISOString().split('T')[0]
+                                          }));
+                                        }
+                                        if (newEndDate) {
+                                          setReservationData(prev => ({
+                                            ...prev,
+                                            checkOutDate: newEndDate.toISOString().split('T')[0]
+                                          }));
+                                        }
+                                      }}
+                                      minDate={today}
+                                      monthsShown={window.innerWidth > 768 ? 2 : 1}
+                                      className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
+                                      placeholderText="Select check-in and check-out dates"
+                                      wrapperClassName="w-full"
+                                    />
+                                  </div>
                                   <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
                                 </div>
                                 {errors.dates && <p className="mt-1 text-sm text-red-500">{errors.dates}</p>}
