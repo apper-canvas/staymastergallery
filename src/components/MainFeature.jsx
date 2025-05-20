@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 
-const MainFeature = () => {
+const MainFeature = ({ addNewBooking }) => {
   // Form state
   const [reservationData, setReservationData] = useState({
     guestName: '',
@@ -111,6 +111,21 @@ const MainFeature = () => {
       // Simulate API request
       setTimeout(() => {
         setIsSubmitting(false);
+        
+        // Create the booking object in the format expected by the Recent Bookings section
+        const newBooking = {
+          guest: reservationData.guestName,
+          checkIn: reservationData.checkInDate,
+          checkOut: reservationData.checkOutDate,
+          roomType: roomTypes.find(room => room.id === reservationData.roomType)?.name || 'Standard',
+        };
+        
+        // Add the new booking to the Recent Bookings section if the addNewBooking prop exists
+        if (typeof addNewBooking === 'function') {
+          addNewBooking(newBooking);
+        }
+        
+        // Show success toast
         toast.success('Reservation created successfully!');
         
         // Reset form

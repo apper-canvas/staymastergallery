@@ -40,6 +40,17 @@ const mockRecentBookings = [
 const Home = () => {
   const [stats, setStats] = useState(mockStats);
   const [roomsData, setRoomsData] = useState(mockRoomStatus);
+  
+  // Add a new booking to the recentBookings state
+  const addNewBooking = (booking) => {
+    // Create a new booking with an id and add it to the recentBookings
+    const newBooking = {
+      id: recentBookings.length + 1,
+      ...booking,
+      status: 'confirmed'
+    };
+    setRecentBookings(prevBookings => [newBooking, ...prevBookings]);
+  };
   const [recentBookings, setRecentBookings] = useState(mockRecentBookings);
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -126,7 +137,7 @@ const Home = () => {
         </div>
 
         {/* Main Feature Component */}
-        <MainFeature />
+        <MainFeature addNewBooking={addNewBooking} />
 
         {/* Tabs */}
         <div className="mb-6 mt-10 border-b border-surface-200 dark:border-surface-700">
