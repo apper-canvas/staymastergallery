@@ -829,8 +829,6 @@ const MainFeature = ({ addNewBooking }) => {
                           </button>
                         </div>
                       </motion.div>
-                          </div>
-                      </motion.div>
                     )}
                     {/* Step 4: Preferences & Payment */}
                     {currentStep === 4 && (
@@ -1391,8 +1389,7 @@ const MainFeature = ({ addNewBooking }) => {
                   )}
                 </AnimatePresence>
               </div>
-              </div>
-            </motion.div>
+            </div>
           )}
 
           {activeFeatureTab === 'roomAvailability' && (
