@@ -21,8 +21,6 @@ const MainFeature = ({ addNewBooking }) => {
     email: '',
     phone: '',
     address: '',
-    phone: '',
-    address: '',
     city: '',
     state: '',
     zipCode: '',
@@ -809,19 +807,19 @@ const MainFeature = ({ addNewBooking }) => {
                                   </div>
                                 </div>
                       </div>
-                             </div>
-                           </div>
-                         </div>
-                        
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <div className="flex justify-between mt-8">
                           <button
                             type="button"
                             onClick={() => goToStep(2)}
                             className="btn-outline py-2.5 px-6">
-                            Back
+                            className="btn-outline py-2.5 px-6"
+                          >
                           </button>
                             </button>
-                          <button
                             type="submit"
                             className="btn-primary py-2.5 px-6 group"
                           >
@@ -1298,8 +1296,8 @@ const MainFeature = ({ addNewBooking }) => {
                                   </div>
                                 </div>
                             </div>
+                              </div>
                             </div>
-                            
                           <div className="mt-6">
                             <div className="flex items-center">
                               <input
