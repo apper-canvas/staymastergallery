@@ -806,11 +806,11 @@ const MainFeature = ({ addNewBooking }) => {
                                     </button>
                                   </div>
                                 </div>
-                      </div>
                               </div>
                             </div>
                           </div>
-                        
+                        </div>
+                      </motion.div>
                         <div className="flex justify-between mt-8">
                           <button
                             type="button"
@@ -827,7 +827,6 @@ const MainFeature = ({ addNewBooking }) => {
                             <CgArrowLongRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </div>
-                    )}
                     
                     {/* Step 4: Preferences & Payment */}
                     {currentStep === 4 && (
@@ -1294,7 +1293,7 @@ const MainFeature = ({ addNewBooking }) => {
                                     </div>
                                   </div>
                                 </div>
-                            </div>
+                              </div>
                             </div>
                           <div className="mt-6">
                             <div className="flex items-center">
@@ -1357,6 +1356,7 @@ const MainFeature = ({ addNewBooking }) => {
                         </div>
                       </motion.div>
                     )}
+                  </AnimatePresence>
                   </AnimatePresence>
                   
                   {/* Special Requests - Only displayed on Step 3 and can be toggled */}
