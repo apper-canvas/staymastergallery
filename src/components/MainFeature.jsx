@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { 
          FaBed, 
          FaUsers, 
@@ -37,7 +36,6 @@ const MainFeature = ({ addNewBooking }) => {
   // Form validation
   // Multi-step form state
   const [currentStep, setCurrentStep] = useState(1);
-  const [errors, setErrors] = useState({});
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [formProgress, setFormProgress] = useState(25);
@@ -216,7 +214,7 @@ const MainFeature = ({ addNewBooking }) => {
     
     setErrors(newErrors);
     if (isValid && currentStep < totalSteps) goToStep(currentStep + 1);
-  };
+  }; 
 
   // Handle date changes
   const handleDateChange = (dates) => {
@@ -488,10 +486,7 @@ const MainFeature = ({ addNewBooking }) => {
                                           if (update[0] && update[1]) {
                                             document.activeElement.blur();
                                           }
-                                          setStartDate(newStartDate);
-                                          setEndDate(newEndDate);
-                                        }
-                                        }
+                                        }}
                                         minDate={today}
                                         monthsShown={window.innerWidth > 768 ? 2 : 1}
                                         className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
