@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { format, addDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { toast } from 'react-toastify';
 import { FaBed, FaUsers, FaRegCalendarCheck, FaConciergeBell, FaWifi, 
          FaSwimmingPool, FaParking, FaUtensils, FaSnowflake, 
          FaTv, FaLeaf, FaCheckCircle } from 'react-icons/fa';
@@ -13,7 +15,8 @@ const MainFeature = ({ addNewBooking }) => {
   // Form state
   const [reservationData, setReservationData] = useState({
     guestName: '',
-    email: '',
+  const CalendarIcon = getIcon('calendar');
+  
     phone: '',
     roomType: 'standard',
     checkInDate: '',
@@ -22,11 +25,14 @@ const MainFeature = ({ addNewBooking }) => {
     children: 0,
     specialRequests: ''
   });
-
+    specialRequests: '',
+    roomNumber: ''
   // Validation state
-  const [errors, setErrors] = useState({});
+  
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); 
   
+  // Form validation
   // Multi-step form state
   const [currentStep, setCurrentStep] = useState(1);
   const [formProgress, setFormProgress] = useState(25);
@@ -45,8 +51,12 @@ const MainFeature = ({ addNewBooking }) => {
   
   // Date selection state
   const [dateRange, setDateRange] = useState([null, null]);
-  const [startDate, endDate] = dateRange;
-  
+      newErrors.checkInDate = 'Please select check-in date';
+    }
+    
+    if (!reservationData.checkOutDate) {
+      newErrors.checkOutDate = 'Please select check-out date';
+    } else if (reservationData.checkInDate && reservationData.checkOutDate <= reservationData.checkInDate) {
   // Room Types with details and pricing
   const roomTypes = [
     { id: 'standard', name: 'Standard Room', rate: 99, available: 8, capacity: 2, bedType: 'Queen', image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning'], color: 'blue' },
@@ -56,6 +66,16 @@ const MainFeature = ({ addNewBooking }) => {
   ];
 
   // Define the active tab state (Reservation Form, Room Availability)
+  // Handle date changes
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    setReservationData({
+      ...reservationData,
+      checkInDate: start,
+      checkOutDate: end || (start ? addDays(start, 1) : null)
+    });
+  };
+
   const [activeFeatureTab, setActiveFeatureTab] = useState('reservationForm');
 
   // Calculate minimum dates for check-in and check-out
@@ -71,9 +91,9 @@ const MainFeature = ({ addNewBooking }) => {
   // Handle step navigation
   const goToStep = (step) => {
     setCurrentStep(step);
-    setFormProgress(step * (100 / totalSteps));
-    formStepRefs[`step${step}`]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    toast.success("Booking details updated!");
 
   // Update reservation costs when dates or room type changes
   useEffect(() => {
@@ -97,7 +117,7 @@ const MainFeature = ({ addNewBooking }) => {
   // Update form data when date range changes
   useEffect(() => {
     if (startDate && endDate) {
-      setReservationData(prev => ({
+            <div>
         ...prev,
         checkInDate: startDate.toISOString().split('T')[0],
         checkOutDate: endDate.toISOString().split('T')[0]
@@ -109,6 +129,7 @@ const MainFeature = ({ addNewBooking }) => {
   useEffect(() => {
     setReservationData(prev => ({
       ...prev,
+                  required
       roomType: selectedRoomType
     }));
   }, [selectedRoomType]);
@@ -122,20 +143,30 @@ const MainFeature = ({ addNewBooking }) => {
       newErrors.guestName = 'Guest name is required';
     }
     
-    if (!reservationData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(reservationData.email)) {
-      newErrors.email = 'Email address is invalid';
-    }
-    
-    if (!reservationData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    }
-    
-    return Object.keys(newErrors).length === 0;
+            <div>
+              <label className="label" htmlFor="dates">Check-in & Check-out</label>
+              <div className="relative bg-white dark:bg-surface-700 border border-surface-300 dark:border-surface-600 rounded-lg hover:border-primary dark:hover:border-primary-light focus-within:border-primary dark:focus-within:border-primary-light transition-colors duration-200">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CalendarIcon className="h-5 w-5 text-surface-500 dark:text-surface-400" />
+                </div>
+                <DatePicker
+                  selected={reservationData.checkInDate}
+                  onChange={handleDateChange}
+                  startDate={reservationData.checkInDate}
+                  endDate={reservationData.checkOutDate}
+                  selectsRange
+                  monthsShown={2}
+                  minDate={new Date()}
+                  className="w-full py-2 pl-10 pr-3 bg-transparent outline-none placeholder-surface-500 text-surface-900 dark:text-white text-base cursor-pointer"
+                  placeholderText="Select check-in and check-out dates"
+                  dateFormat="MMM d, yyyy"
+                  open={datePickerOpen}
+                  onInputClick={() => setDatePickerOpen(true)}
+                  onClickOutside={() => setDatePickerOpen(false)}
+                />
   };
-  
-  const handleInputChange = (e) => {
+              {(errors.checkInDate || errors.checkOutDate) && (
+                <p className="text-red-500 text-xs mt-1">{errors.checkInDate || errors.checkOutDate}</p>
     setErrors({});
     
     const { name, value } = e.target;
@@ -146,6 +177,7 @@ const MainFeature = ({ addNewBooking }) => {
   };
 
   // Handle reservation submission
+                  id="roomNumber"
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -194,7 +226,7 @@ const MainFeature = ({ addNewBooking }) => {
   // Handle submission for multi-step form
   const handleStepSubmit = (e) => {
     e.preventDefault();
-    
+        bookingData={reservationData}
     // Validate current step
     let isValid = true;
     const newErrors = {};
