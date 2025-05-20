@@ -32,6 +32,7 @@ const MainFeature = ({ addNewBooking }) => {
     checkInDate: '',
     checkOutDate: '',
     adults: 1,
+    adults: 1,
     children: 0,
     specialRequests: '',
     paymentMethod: 'credit',
@@ -43,10 +44,10 @@ const MainFeature = ({ addNewBooking }) => {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   
   // Form validation
   // Multi-step form state
-  const [currentStep, setCurrentStep] = useState(1);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [formProgress, setFormProgress] = useState(25);
@@ -810,9 +811,10 @@ const MainFeature = ({ addNewBooking }) => {
                          </div>
                         
                         <div className="flex justify-between mt-8">
+                          <button
+                            type="button"
                             onClick={() => goToStep(2)}
                             className="btn-outline py-2.5 px-6"
-                          >
                             Back
                           </button>
                           <button
@@ -1015,8 +1017,7 @@ const MainFeature = ({ addNewBooking }) => {
                           <button
                             type="button"
                             onClick={() => goToStep(3)}
-                            type="button"
-                            onClick={() => goToStep(2)}
+                            
                             className="btn-outline py-2.5 px-6"
                           >
                             Back
@@ -1284,11 +1285,6 @@ const MainFeature = ({ addNewBooking }) => {
                                       <span className="font-medium">${Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) * (roomTypes.find(r => r.id === selectedRoomType)?.rate || 0) * reservationData.numRooms}</span>
                                     </div>
                                     
-                                    <div className="flex justify-between text-surface-900 dark:text-white">
-                                      <span>Room Rate:</span>
-                                      <span className="font-medium">${roomTypes.find(r => r.id === selectedRoomType)?.rate} × {Math.round((endDate - startDate) / (1000 * 60 * 60 * 24))} nights</span>
-                                    </div>
-                                    <div className="border-t border-surface-200 dark:border-surface-700 pt-2 mt-2">
                                       <div className="flex justify-between text-lg font-semibold text-surface-900 dark:text-white">
                                         <span>Total:</span>
                                         <span className="text-primary dark:text-primary-light">
