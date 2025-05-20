@@ -382,7 +382,7 @@ const MainFeature = ({ addNewBooking }) => {
 
         {/* Feature Content */}
         <AnimatePresence mode="wait">
-          {activeFeatureTab === 'reservationForm' && (
+          {activeFeatureTab === 'reservationForm' ? (
             <motion.div
               key="reservation-form"
               initial={{ opacity: 0, y: 10 }}
@@ -435,6 +435,7 @@ const MainFeature = ({ addNewBooking }) => {
                 </div>
                 
                 <form onSubmit={handleStepSubmit}>
+                  <AnimatePresence mode="wait">
                   {/* Step 1: Room Selection */}
                   <AnimatePresence mode="wait">
                     {currentStep === 1 && (
@@ -1358,7 +1359,6 @@ const MainFeature = ({ addNewBooking }) => {
                         </div>
                       </motion.div>
                     )}
-                </form>
                   
                   {/* Special Requests - Only displayed on Step 3 and can be toggled */}
                   {currentStep === 3 && (
@@ -1386,13 +1386,15 @@ const MainFeature = ({ addNewBooking }) => {
                           ></textarea>
                         </div>
                       </div>
+                    </motion.div>
                   )}
+                  </AnimatePresence>
+                </form>
                 </AnimatePresence>
               </div>
-            </div>
-          )}
-
-          {activeFeatureTab === 'roomAvailability' && (
+          ) : (
+            /* Room Availability Tab */
+            <motion.div
             <motion.div
               key="room-availability"
               initial={{ opacity: 0, y: 10 }}
