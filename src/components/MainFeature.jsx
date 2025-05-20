@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { format, addDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
@@ -129,23 +129,40 @@ const MainFeature = ({ addNewBooking }) => {
     
     if (!reservationData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-    }
-    
-    if (!reservationData.checkInDate) {
-      newErrors.checkInDate = 'Check-in date is required';
-    }
-    
-    if (!reservationData.checkOutDate) {
-      newErrors.checkOutDate = 'Check-out date is required';
-    } else if (reservationData.checkInDate && new Date(reservationData.checkOutDate) <= new Date(reservationData.checkInDate)) {
-      newErrors.checkOutDate = 'Check-out must be after check-in';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form input changes
+                  <div 
+                    className="input pl-10 flex items-center cursor-pointer hover:border-primary"
+                    onClick={() => {
+                      // This helps ensure the DatePicker opens on click
+                      document.getElementById('date-picker-input').focus();
+                    }}
+                  >
+                    {formData.checkInDate && formData.checkOutDate ? (
+                      <span className="text-surface-900 dark:text-white font-medium">
+                        {format(formData.checkInDate, 'MMM dd, yyyy')} - {format(formData.checkOutDate, 'MMM dd, yyyy')}
+                      </span>
+                    ) : (
+                      <span className="text-surface-500">Select date range</span>
+                    )}
+                  </div>
+                  <div className="absolute top-0 left-0 z-10">
+                    <DatePicker
+                      id="date-picker-input"
+                      selected={formData.checkInDate}
+                      onChange={(dates) => {
+                        const [start, end] = dates;
+                        setFormData({
+                          ...formData,
+                          checkInDate: start,
+                          checkOutDate: end || (start ? addDays(start, 1) : null)
+                        });
+                      }}
+                      startDate={formData.checkInDate}
+                      endDate={formData.checkOutDate}
+                      minDate={new Date()}
+                      selectsRange
+                      className="opacity-0 absolute"
+                    />
+                  </div>
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReservationData(prev => ({
