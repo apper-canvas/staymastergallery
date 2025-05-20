@@ -815,11 +815,10 @@ const MainFeature = ({ addNewBooking }) => {
                           <button
                             type="button"
                             onClick={() => goToStep(2)}
-                            className="btn-outline py-2.5 px-6">
                             className="btn-outline py-2.5 px-6"
                           >
+                            Back
                           </button>
-                            </button>
                             type="submit"
                             className="btn-primary py-2.5 px-6 group"
                           >
@@ -1296,7 +1295,6 @@ const MainFeature = ({ addNewBooking }) => {
                                   </div>
                                 </div>
                             </div>
-                              </div>
                             </div>
                           <div className="mt-6">
                             <div className="flex items-center">
