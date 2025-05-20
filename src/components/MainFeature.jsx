@@ -435,7 +435,6 @@ const MainFeature = ({ addNewBooking }) => {
                 </div>
                 
                 <form onSubmit={handleStepSubmit}>
-                  <AnimatePresence mode="wait">
                   {/* Step 1: Room Selection */}
                   <AnimatePresence mode="wait">
                     {currentStep === 1 && (
@@ -1390,11 +1389,10 @@ const MainFeature = ({ addNewBooking }) => {
                   )}
                   </AnimatePresence>
                 </form>
-                </AnimatePresence>
               </div>
-          ) : (
+            </motion.div>
+          ) : ( 
             /* Room Availability Tab */
-            <motion.div
             <motion.div
               key="room-availability"
               initial={{ opacity: 0, y: 10 }}
