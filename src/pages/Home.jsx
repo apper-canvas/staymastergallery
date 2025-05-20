@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
 import { format } from 'date-fns';
+import BookingDetailsModal from '../components/BookingDetailsModal';
 
 // Mock data
 const mockRoomStatus = [
@@ -41,6 +42,8 @@ const Home = () => {
   const [stats, setStats] = useState(mockStats);
   const [roomsData, setRoomsData] = useState(mockRoomStatus);
   
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   // Add a new booking to the recentBookings state
   const addNewBooking = (booking) => {
     // Create a new booking with an id and add it to the recentBookings
@@ -93,6 +96,13 @@ const Home = () => {
     const room = roomsData.find(r => r.id === roomId);
     toast.success(`Room ${room.number} status changed to ${newStatus}`);
   };
+
+  const handleViewBookingDetails = (booking) => {
+    // Set the selected booking and open the modal
+    setSelectedBooking(booking);
+    setIsBookingModalOpen(true);
+  };
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -367,8 +377,8 @@ const Home = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <button 
-                              onClick={() => toast.info(`Booking details for ${booking.guest}`)}
-                              className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-md"
+                              onClick={() => handleViewBookingDetails(booking)}
+                              className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                             >
                               View Details
                             </button>
@@ -383,6 +393,13 @@ const Home = () => {
           )}
         </div>
       </div>
+      
+      {/* Booking Details Modal */}
+      <BookingDetailsModal 
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        booking={selectedBooking}
+      />
     </div>
   );
 };
