@@ -21,6 +21,8 @@ const MainFeature = ({ addNewBooking }) => {
     email: '',
     phone: '',
     address: '',
+    phone: '',
+    address: '',
     city: '',
     state: '',
     zipCode: '',
@@ -41,10 +43,10 @@ const MainFeature = ({ addNewBooking }) => {
     promoCode: '',
     termsAccepted: false
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
   // Form validation
   // Multi-step form state
   const [currentStep, setCurrentStep] = useState(1);
@@ -60,17 +62,18 @@ const MainFeature = ({ addNewBooking }) => {
     step4: useRef(null),
     step5: useRef(null)
   };
-  
+
   // Room selection state
   const [selectedRoomType, setSelectedRoomType] = useState('standard');
-  
+  const [startDate, setStartDate] = useState(null);
+
   const roomTypes = [
-    const [startDate, setStartDate] = useState(null);
     { id: 'standard', name: 'Standard Room', rate: 99, available: 8, capacity: 2, bedType: 'Queen', image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning'], color: 'blue' },
     { id: 'deluxe', name: 'Deluxe Room', rate: 149, available: 5, capacity: 2, bedType: 'King', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning', 'Mini Bar', 'City View'], color: 'green' },
     { id: 'suite', name: 'Executive Suite', rate: 249, available: 3, capacity: 4, bedType: 'King + Sofa', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'Smart TV', 'Air Conditioning', 'Mini Bar', 'Balcony', 'Lounge Area', 'Premium Toiletries'], color: 'purple' },
-    { id: 'family', name: 'Family Room', rate: 199, available: 2, capacity: 4, bedType: '2 Queen' },
+    { id: 'family', name: 'Family Room', rate: 199, available: 2, capacity: 4, bedType: '2 Queen' }
   ];
+
 
   // Bed type options
   const bedTypes = [
@@ -303,7 +306,7 @@ const MainFeature = ({ addNewBooking }) => {
 
     setErrors(newErrors);
     if (isValid && currentStep < totalSteps) goToStep(currentStep + 1);
-  }; 
+  };
 
   // Handle date changes
   const handleDateChange = (dates) => {
@@ -815,7 +818,8 @@ const MainFeature = ({ addNewBooking }) => {
                             type="button"
                             onClick={() => goToStep(2)}
                             className="btn-outline py-2.5 px-6">
-                              Back
+                            Back
+                          </button>
                             </button>
                           <button
                             type="submit"
@@ -1119,8 +1123,8 @@ const MainFeature = ({ addNewBooking }) => {
                     {/* Step 4: Summary and Confirmation */}
                     {currentStep === 5 && (
                       <motion.div
-                        ref={formStepRefs.step4}
-                        key="step4"
+                        ref={formStepRefs.step5}
+                        key="step5"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
@@ -1293,7 +1297,7 @@ const MainFeature = ({ addNewBooking }) => {
                                     </div>
                                   </div>
                                 </div>
-                              </div>
+                            </div>
                             </div>
                             
                           <div className="mt-6">
