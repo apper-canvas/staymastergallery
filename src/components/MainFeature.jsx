@@ -32,7 +32,6 @@ const MainFeature = ({ addNewBooking }) => {
     checkInDate: '',
     checkOutDate: '',
     adults: 1,
-    adults: 1,
     children: 0,
     specialRequests: '',
     paymentMethod: 'credit',
@@ -48,7 +47,7 @@ const MainFeature = ({ addNewBooking }) => {
   
   // Form validation
   // Multi-step form state
-  const [startDate, setStartDate] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
   const [endDate, setEndDate] = useState(null);
   const [formProgress, setFormProgress] = useState(25);
   const totalSteps = 5;
@@ -66,6 +65,7 @@ const MainFeature = ({ addNewBooking }) => {
   const [selectedRoomType, setSelectedRoomType] = useState('standard');
   
   const roomTypes = [
+    const [startDate, setStartDate] = useState(null);
     { id: 'standard', name: 'Standard Room', rate: 99, available: 8, capacity: 2, bedType: 'Queen', image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning'], color: 'blue' },
     { id: 'deluxe', name: 'Deluxe Room', rate: 149, available: 5, capacity: 2, bedType: 'King', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning', 'Mini Bar', 'City View'], color: 'green' },
     { id: 'suite', name: 'Executive Suite', rate: 249, available: 3, capacity: 4, bedType: 'King + Sofa', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'Smart TV', 'Air Conditioning', 'Mini Bar', 'Balcony', 'Lounge Area', 'Premium Toiletries'], color: 'purple' },
@@ -814,9 +814,9 @@ const MainFeature = ({ addNewBooking }) => {
                           <button
                             type="button"
                             onClick={() => goToStep(2)}
-                            className="btn-outline py-2.5 px-6"
-                            Back
-                          </button>
+                            className="btn-outline py-2.5 px-6">
+                              Back
+                            </button>
                           <button
                             type="submit"
                             className="btn-primary py-2.5 px-6 group"
@@ -1017,7 +1017,6 @@ const MainFeature = ({ addNewBooking }) => {
                           <button
                             type="button"
                             onClick={() => goToStep(3)}
-                            
                             className="btn-outline py-2.5 px-6"
                           >
                             Back
