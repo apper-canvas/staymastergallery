@@ -20,17 +20,28 @@ const MainFeature = ({ addNewBooking }) => {
     guestName: '',
     email: '',
     phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: '',
     roomType: 'standard',
+    numRooms: 1,
+    bedType: 'king',
+    smokingPreference: 'non-smoking',
     checkInDate: '',
     checkOutDate: '',
     adults: 1,
     children: 0,
     specialRequests: '',
-    roomNumber: ''
+    paymentMethod: 'credit',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCVV: '',
+    promoCode: '',
+    termsAccepted: false
   });
   
-  // Validation state
-  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form validation
@@ -39,14 +50,15 @@ const MainFeature = ({ addNewBooking }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [formProgress, setFormProgress] = useState(25);
-  const totalSteps = 4;
-  
+  const totalSteps = 5;
+
   // Animated form refs for scroll into view
   const formStepRefs = {
     step1: useRef(null),
     step2: useRef(null),
     step3: useRef(null),
-    step4: useRef(null)
+    step4: useRef(null),
+    step5: useRef(null)
   };
   
   // Room selection state
@@ -58,6 +70,30 @@ const MainFeature = ({ addNewBooking }) => {
     { id: 'suite', name: 'Executive Suite', rate: 249, available: 3, capacity: 4, bedType: 'King + Sofa', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'Smart TV', 'Air Conditioning', 'Mini Bar', 'Balcony', 'Lounge Area', 'Premium Toiletries'], color: 'purple' },
     { id: 'family', name: 'Family Room', rate: 199, available: 2, capacity: 4, bedType: '2 Queen' },
   ];
+
+  // Bed type options
+  const bedTypes = [
+    { id: 'king', name: 'King Bed' },
+    { id: 'queen', name: 'Queen Bed' },
+    { id: 'double', name: 'Double Bed' },
+    { id: 'twin', name: 'Twin Beds' },
+    { id: 'single', name: 'Single Bed' }
+  ];
+
+  // Smoking preference options
+  const smokingOptions = [
+    { id: 'non-smoking', name: 'Non-Smoking' },
+    { id: 'smoking', name: 'Smoking' }
+  ];
+
+  // Payment method options
+  const paymentMethods = [
+    { id: 'credit', name: 'Credit/Debit Card' },
+    { id: 'upi', name: 'UPI' },
+    { id: 'netbanking', name: 'Net Banking' },
+    { id: 'cash', name: 'Cash at Hotel' }
+  ];
+
 
   // Define the active tab state (Reservation Form, Room Availability)
 
@@ -75,7 +111,7 @@ const MainFeature = ({ addNewBooking }) => {
   // Handle step navigation
   const goToStep = (step) => {
     setCurrentStep(step);
-    setFormProgress(step * 25);
+    setFormProgress(step * (100 / totalSteps));
   };
 
   // Update reservation costs when dates or room type changes
@@ -125,6 +161,34 @@ const MainFeature = ({ addNewBooking }) => {
       newErrors.guestName = 'Guest name is required';
     }
 
+    if (!reservationData.email || !reservationData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/\S+@\S+\.\S+/.test(reservationData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!reservationData.phone || !reservationData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    }
+
+    if (currentStep === 4) {
+      if (reservationData.paymentMethod === 'credit') {
+        if (!reservationData.cardNumber || !reservationData.cardNumber.trim()) {
+          newErrors.cardNumber = 'Card number is required';
+        } else if (!/^\d{16}$/.test(reservationData.cardNumber.replace(/\s/g, ''))) {
+          newErrors.cardNumber = 'Please enter a valid 16-digit card number';
+        }
+
+        if (!reservationData.cardExpiry || !reservationData.cardExpiry.trim()) {
+          newErrors.cardExpiry = 'Expiry date is required';
+        }
+
+        if (!reservationData.cardCVV || !reservationData.cardCVV.trim()) {
+          newErrors.cardCVV = 'CVV is required';
+        }
+      }
+    }
+
     if (!reservationData.checkInDate) {
       newErrors.checkInDate = 'Please select check-in date';
     }
@@ -136,6 +200,10 @@ const MainFeature = ({ addNewBooking }) => {
     }
     
     setErrors(newErrors);
+    
+    if (currentStep === 5 && !reservationData.termsAccepted) {
+      newErrors.termsAccepted = 'You must agree to the terms and conditions';
+    }
     return Object.keys(newErrors).length === 0;
   };
   
@@ -185,7 +253,19 @@ const MainFeature = ({ addNewBooking }) => {
           checkOutDate: '',
           adults: 1,
           children: 0,
-          specialRequests: ''
+          specialRequests: '',
+          address: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: '',
+          numRooms: 1,
+          bedType: 'king',
+          smokingPreference: 'non-smoking',
+          paymentMethod: 'credit',
+          cardNumber: '',
+          cardExpiry: '',
+          cardCVV: ''
         });
 
       }, 1500);
@@ -210,8 +290,16 @@ const MainFeature = ({ addNewBooking }) => {
     } else if (currentStep === 3 && !reservationData.guestName) {
       validateForm(); // Use existing validation for guest info
       return;
+    } else if (currentStep === 4) {
+      if (reservationData.paymentMethod === 'credit' && (!reservationData.cardNumber || !reservationData.cardExpiry || !reservationData.cardCVV)) {
+        validateForm();
+        return;
+      }
+    } else if (currentStep === 5 && !reservationData.termsAccepted) {
+      newErrors.termsAccepted = 'You must agree to the terms and conditions';
+      isValid = false;
     }
-    
+
     setErrors(newErrors);
     if (isValid && currentStep < totalSteps) goToStep(currentStep + 1);
   }; 
@@ -227,6 +315,15 @@ const MainFeature = ({ addNewBooking }) => {
       checkOutDate: end ? end.toISOString().split('T')[0] : (start ? addDays(start, 1).toISOString().split('T')[0] : '')
     }));
   };
+  // Format credit card number with spaces
+  const formatCardNumber = (value) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+    for (let i = 0, len = match.length; i < len; i += 4) parts.push(match.substring(i, i + 4));
+    return parts.length > 0 ? parts.join(' ') : value;
+  };
 
   // Icons
   const CalendarIcon = getIcon('calendar');
@@ -238,8 +335,12 @@ const MainFeature = ({ addNewBooking }) => {
   const BedIcon = getIcon('bed');
   const SearchIcon = getIcon('search');
   const PlusIcon = getIcon('plus');
+  const CreditCardIcon = getIcon('credit-card');
+  const MapPinIcon = getIcon('map-pin');
   const MinusIcon = getIcon('minus');
   const ClipboardIcon = getIcon('clipboard');
+  const ShieldIcon = getIcon('shield');
+  const TagIcon = getIcon('tag');
   const CheckIcon = getIcon('check-circle');
   const LoaderIcon = getIcon('loader');
   
@@ -709,7 +810,211 @@ const MainFeature = ({ addNewBooking }) => {
                          </div>
                         
                         <div className="flex justify-between mt-8">
+                            onClick={() => goToStep(2)}
+                            className="btn-outline py-2.5 px-6"
+                          >
+                            Back
+                          </button>
                           <button
+                            type="submit"
+                            className="btn-primary py-2.5 px-6 group"
+                          >
+                            Continue to Preferences & Payment
+                            <CgArrowLongRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {/* Step 4: Preferences & Payment */}
+                    {currentStep === 4 && (
+                      <motion.div
+                        ref={formStepRefs.step4}
+                        key="step4"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center mb-8">
+                          <h3 className="text-xl font-semibold text-surface-800 dark:text-surface-100 mb-2">
+                            Room Preferences & Payment
+                          </h3>
+                          <p className="text-surface-600 dark:text-surface-400">
+                            Choose your preferences and provide payment details
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-surface-800 rounded-xl p-6 border border-surface-200 dark:border-surface-700 shadow-md">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <div className="flex items-center mb-4">
+                                <BedIcon className="text-primary mr-2 h-5 w-5" />
+                                <h4 className="text-lg font-medium text-surface-800 dark:text-surface-200">Room Preferences</h4>
+                              </div>
+                              
+                              <div className="space-y-4">
+                                <div>
+                                  <label htmlFor="numRooms" className="label">Number of Rooms</label>
+                                  <div className="flex items-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => setReservationData(prev => ({ ...prev, numRooms: Math.max(1, prev.numRooms - 1) }))}
+                                      className="p-3 rounded-l-lg bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
+                                    >
+                                      <MinusIcon className="h-4 w-4" />
+                                    </button>
+                                    <div className="px-6 py-3 bg-white dark:bg-surface-800 border-t border-b border-surface-300 dark:border-surface-600 text-center font-medium text-lg w-20">
+                                      {reservationData.numRooms}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setReservationData(prev => ({ ...prev, numRooms: Math.min(5, prev.numRooms + 1) }))}
+                                      className="p-3 rounded-r-lg bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
+                                    >
+                                      <PlusIcon className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="label">Bed Type</label>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {bedTypes.map((type) => (
+                                      <div 
+                                        key={type.id}
+                                        onClick={() => setReservationData(prev => ({ ...prev, bedType: type.id }))}
+                                        className={`cursor-pointer flex items-center p-3 rounded-lg border ${
+                                          reservationData.bedType === type.id
+                                            ? 'border-primary bg-primary/10 text-primary dark:border-primary-light dark:bg-primary/20 dark:text-primary-light'
+                                            : 'border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300'
+                                        }`}
+                                      >
+                                        <FaBed className="mr-2" />
+                                        <span>{type.name}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="label">Smoking Preference</label>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {smokingOptions.map((option) => (
+                                      <div 
+                                        key={option.id}
+                                        onClick={() => setReservationData(prev => ({ ...prev, smokingPreference: option.id }))}
+                                        className={`cursor-pointer flex items-center p-3 rounded-lg border ${
+                                          reservationData.smokingPreference === option.id
+                                            ? 'border-primary bg-primary/10 text-primary dark:border-primary-light dark:bg-primary/20 dark:text-primary-light'
+                                            : 'border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300'
+                                        }`}
+                                      >
+                                        {option.id === 'non-smoking' ? <FaLeaf className="mr-2" /> : <FaCheckCircle className="mr-2" />}
+                                        <span>{option.name}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center mb-4">
+                                <CreditCardIcon className="text-primary mr-2 h-5 w-5" />
+                                <h4 className="text-lg font-medium text-surface-800 dark:text-surface-200">Payment Details</h4>
+                              </div>
+                              
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="label">Payment Method</label>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {paymentMethods.map((method) => (
+                                      <div 
+                                        key={method.id}
+                                        onClick={() => setReservationData(prev => ({ ...prev, paymentMethod: method.id }))}
+                                        className={`cursor-pointer flex items-center p-3 rounded-lg border ${
+                                          reservationData.paymentMethod === method.id
+                                            ? 'border-primary bg-primary/10 text-primary dark:border-primary-light dark:bg-primary/20 dark:text-primary-light'
+                                            : 'border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300'
+                                        }`}
+                                      >
+                                        {method.id === 'credit' && <CreditCardIcon className="mr-2 h-4 w-4" />}
+                                        {method.id === 'upi' && <ShieldIcon className="mr-2 h-4 w-4" />}
+                                        {method.id === 'netbanking' && <HomeIcon className="mr-2 h-4 w-4" />}
+                                        {method.id === 'cash' && <UserIcon className="mr-2 h-4 w-4" />}
+                                        <span>{method.name}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                {reservationData.paymentMethod === 'credit' && (
+                                  <>
+                                    <div>
+                                      <label htmlFor="cardNumber" className="label">Card Number</label>
+                                      <div className="relative">
+                                        <input
+                                          type="text"
+                                          id="cardNumber"
+                                          name="cardNumber"
+                                          value={reservationData.cardNumber}
+                                          onChange={(e) => {
+                                            const formattedValue = formatCardNumber(e.target.value);
+                                            setReservationData(prev => ({ ...prev, cardNumber: formattedValue }));
+                                          }}
+                                          maxLength={19}
+                                          className={`input pl-9 ${errors.cardNumber ? 'border-red-500 dark:border-red-400' : ''}`}
+                                          placeholder="1234 5678 9012 3456"
+                                        />
+                                        <CreditCardIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
+                                      </div>
+                                      {errors.cardNumber && <p className="mt-1 text-sm text-red-500">{errors.cardNumber}</p>}
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label htmlFor="cardExpiry" className="label">Expiry Date</label>
+                                        <input
+                                          type="text"
+                                          id="cardExpiry"
+                                          name="cardExpiry"
+                                          value={reservationData.cardExpiry}
+                                          onChange={handleInputChange}
+                                          className={`input ${errors.cardExpiry ? 'border-red-500 dark:border-red-400' : ''}`}
+                                          placeholder="MM/YY"
+                                          maxLength={5}
+                                        />
+                                        {errors.cardExpiry && <p className="mt-1 text-sm text-red-500">{errors.cardExpiry}</p>}
+                                      </div>
+                                      
+                                      <div>
+                                        <label htmlFor="cardCVV" className="label">CVV</label>
+                                        <input
+                                          type="text"
+                                          id="cardCVV"
+                                          name="cardCVV"
+                                          value={reservationData.cardCVV}
+                                          onChange={handleInputChange}
+                                          className={`input ${errors.cardCVV ? 'border-red-500 dark:border-red-400' : ''}`}
+                                          placeholder="123"
+                                          maxLength={3}
+                                        />
+                                        {errors.cardCVV && <p className="mt-1 text-sm text-red-500">{errors.cardCVV}</p>}
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between mt-8">
+                          <button
+                            type="button"
+                            onClick={() => goToStep(3)}
                             type="button"
                             onClick={() => goToStep(2)}
                             className="btn-outline py-2.5 px-6"
@@ -727,8 +1032,92 @@ const MainFeature = ({ addNewBooking }) => {
                       </motion.div>
                     )}
                     
-                    {/* Step 4: Summary and Confirmation */}
+                    {/* Billing Address & Promo Code */}
                     {currentStep === 4 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-6"
+                      >
+                        <div className="bg-surface-50 dark:bg-surface-800/50 rounded-xl p-5 border border-surface-200 dark:border-surface-700">
+                          <h4 className="font-medium text-surface-800 dark:text-surface-200 flex items-center mb-3">
+                            <MapPinIcon className="mr-2 text-primary h-4 w-4" />
+                            Billing Address
+                          </h4>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                              type="text"
+                              name="address"
+                              value={reservationData.address}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="Street Address"
+                            />
+                            <input
+                              type="text"
+                              name="city"
+                              value={reservationData.city}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="City"
+                            />
+                            <input
+                              type="text"
+                              name="state"
+                              value={reservationData.state}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="State/Province"
+                            />
+                            <input
+                              type="text"
+                              name="zipCode"
+                              value={reservationData.zipCode}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="ZIP/Postal Code"
+                            />
+                            <input
+                              type="text"
+                              name="country"
+                              value={reservationData.country}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="Country"
+                            />
+                          </div>
+                          
+                          <div className="mt-4">
+                            <h4 className="font-medium text-surface-800 dark:text-surface-200 flex items-center mb-3">
+                              <TagIcon className="mr-2 text-primary h-4 w-4" />
+                              Promo Code
+                            </h4>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                name="promoCode"
+                                value={reservationData.promoCode}
+                                onChange={handleInputChange}
+                                className="input flex-1"
+                                placeholder="Enter promo code if available"
+                              />
+                              <button
+                                type="button"
+                                className="btn-secondary px-4"
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {/* Step 4: Summary and Confirmation */}
+                    {currentStep === 5 && (
                       <motion.div
                         ref={formStepRefs.step4}
                         key="step4"
@@ -798,7 +1187,24 @@ const MainFeature = ({ addNewBooking }) => {
                                         {reservationData.adults} adults, {reservationData.children} children
                                       </span>
                                     </div>
-                                  </div>
+                                    <div className="flex justify-between">
+                                      <span>Number of Rooms:</span>
+                                      <span className="font-medium">
+                                        {reservationData.numRooms}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Bed Type:</span>
+                                      <span className="font-medium">
+                                        {bedTypes.find(b => b.id === reservationData.bedType)?.name || 'King Bed'}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Room Preference:</span>
+                                      <span className="font-medium">
+                                        {smokingOptions.find(o => o.id === reservationData.smokingPreference)?.name || 'Non-Smoking'}
+                                      </span>
+                                    </div>
                                 </div>
                               </div>
                               
@@ -817,11 +1223,67 @@ const MainFeature = ({ addNewBooking }) => {
                                     <span>Phone:</span>
                                     <span className="font-medium">{reservationData.phone}</span>
                                   </div>
+                                {reservationData.address && (
+                                  <div className="flex justify-between">
+                                    <span>Address:</span>
+                                    <span className="font-medium">
+                                      {reservationData.address}{reservationData.city ? `, ${reservationData.city}` : ''}
+                                      {reservationData.state ? `, ${reservationData.state}` : ''}
+                                      {reservationData.zipCode ? ` ${reservationData.zipCode}` : ''}
+                                      {reservationData.country ? `, ${reservationData.country}` : ''}
+                                    </span>
+                                  </div>
+                                )}
+                                </div>
+                                
+                                <div className="mt-6">
+                                  <h5 className="font-medium text-surface-700 dark:text-surface-300 mb-3">Payment Details</h5>
+                                  <div className="space-y-2 text-surface-900 dark:text-white">
+                                    <div className="flex justify-between">
+                                      <span>Payment Method:</span>
+                                      <span className="font-medium">
+                                        {paymentMethods.find(m => m.id === reservationData.paymentMethod)?.name || 'Credit/Debit Card'}
+                                      </span>
+                                    </div>
+                                    
+                                    {reservationData.paymentMethod === 'credit' && (
+                                      <>
+                                        <div className="flex justify-between">
+                                          <span>Card Number:</span>
+                                          <span className="font-medium">
+                                            **** **** **** {reservationData.cardNumber.slice(-4)}
+                                          </span>
+                                        </div>
+                                        
+                                        <div className="flex justify-between">
+                                          <span>Expiry Date:</span>
+                                          <span className="font-medium">{reservationData.cardExpiry}</span>
+                                        </div>
+                                      </>
+                                    )}
+                                    
+                                    {reservationData.promoCode && (
+                                      <div className="flex justify-between">
+                                        <span>Promo Code:</span>
+                                        <span className="font-medium">{reservationData.promoCode}</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                                 
                                 <div className="mt-6">
                                   <h5 className="font-medium text-surface-700 dark:text-surface-300 mb-3">Pricing Details</h5>
                                   <div className="space-y-2">
+                                    <div className="flex justify-between text-surface-900 dark:text-white">
+                                      <span>Room Rate:</span>
+                                      <span className="font-medium">${roomTypes.find(r => r.id === selectedRoomType)?.rate || 0} × {Math.round((endDate - startDate) / (1000 * 60 * 60 * 24))} nights × {reservationData.numRooms} room(s)</span>
+                                    </div>
+                                    
+                                    <div className="flex justify-between text-surface-900 dark:text-white">
+                                      <span>Subtotal:</span>
+                                      <span className="font-medium">${Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) * (roomTypes.find(r => r.id === selectedRoomType)?.rate || 0) * reservationData.numRooms}</span>
+                                    </div>
+                                    
                                     <div className="flex justify-between text-surface-900 dark:text-white">
                                       <span>Room Rate:</span>
                                       <span className="font-medium">${roomTypes.find(r => r.id === selectedRoomType)?.rate} × {Math.round((endDate - startDate) / (1000 * 60 * 60 * 24))} nights</span>
@@ -839,8 +1301,28 @@ const MainFeature = ({ addNewBooking }) => {
                               </div>
                             </div>
                             
+                          <div className="mt-6">
+                            <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id="termsAccepted"
+                                checked={reservationData.termsAccepted}
+                                onChange={(e) => setReservationData(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                                className={`h-5 w-5 rounded border-surface-300 dark:border-surface-600 text-primary focus:ring-primary ${
+                                  errors.termsAccepted ? 'border-red-500 dark:border-red-400' : ''
+                                }`}
+                              />
+                              <label htmlFor="termsAccepted" className="ml-2 text-surface-700 dark:text-surface-300">
+                                I agree to the <a href="#" className="text-primary underline">Terms and Conditions</a> and <a href="#" className="text-primary underline">Privacy Policy</a>
+                              </label>
+                            </div>
+                            {errors.termsAccepted && (
+                              <p className="mt-1 text-sm text-red-500">{errors.termsAccepted}</p>
+                            )}
+                          </div>
+
                             <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                              <div className="flex items-center text-blue-800 dark:text-blue-300">
+                            <div className="flex items-center text-blue-800 dark:text-blue-300">
                                 <FaConciergeBell className="h-5 w-5 mr-2" />
                                 <span className="font-medium">Special Requests</span>
                               </div>
@@ -854,7 +1336,7 @@ const MainFeature = ({ addNewBooking }) => {
                         <div className="flex justify-between mt-8">
                           <button
                             type="button"
-                            onClick={() => goToStep(3)}
+                            onClick={() => goToStep(4)}
                             className="btn-outline py-2.5 px-6"
                           >
                             Back
