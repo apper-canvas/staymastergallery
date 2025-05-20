@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import Bookings from './pages/Bookings';
 import GuestPortal from './pages/GuestPortal';
 
 function App() {
@@ -143,6 +144,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
+            <Route path="/bookings" element={<Bookings />} />
             <Route path="/guest-portal/*" element={<GuestPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
