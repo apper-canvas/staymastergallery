@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { format, addDays } from 'date-fns';
 import { 
          FaBed, 
          FaUsers, 
@@ -14,6 +13,7 @@ import {
          FaSwimmingPool, FaParking, FaUtensils, FaSnowflake, 
          FaTv, FaLeaf, FaCheckCircle } from 'react-icons/fa';
 import { CgArrowLongRight } from 'react-icons/cg';
+import { format, addDays } from 'date-fns';
 
 const MainFeature = ({ addNewBooking }) => {
   // Form state
@@ -31,9 +31,8 @@ const MainFeature = ({ addNewBooking }) => {
   });
   
   // Validation state
-  
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form validation
   // Multi-step form state
@@ -55,9 +54,6 @@ const MainFeature = ({ addNewBooking }) => {
   // Room selection state
   const [selectedRoomType, setSelectedRoomType] = useState('standard');
   
-  // Date selection state
-  const [dateRange, setDateRange] = useState([null, null]);
-  // Room Types with details and pricing
   const roomTypes = [
     { id: 'standard', name: 'Standard Room', rate: 99, available: 8, capacity: 2, bedType: 'Queen', image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning'], color: 'blue' },
     { id: 'deluxe', name: 'Deluxe Room', rate: 149, available: 5, capacity: 2, bedType: 'King', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning', 'Mini Bar', 'City View'], color: 'green' },
@@ -66,17 +62,6 @@ const MainFeature = ({ addNewBooking }) => {
   ];
 
   // Define the active tab state (Reservation Form, Room Availability)
-  // Handle date changes
-  const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setReservationData({
-      ...reservationData,
-      checkInDate: start,
-      checkOutDate: end || (start ? addDays(start, 1) : null)
-    });
-  };
-
-  const [activeFeatureTab, setActiveFeatureTab] = useState('reservationForm');
 
   // Calculate minimum dates for check-in and check-out
   const today = new Date();
@@ -87,7 +72,8 @@ const MainFeature = ({ addNewBooking }) => {
     nights: 0,
     totalCost: 0
   });
-  
+
+  const [activeFeatureTab, setActiveFeatureTab] = useState('reservationForm');
   // Handle step navigation
   const goToStep = (step) => {
     setCurrentStep(step);
@@ -163,13 +149,6 @@ const MainFeature = ({ addNewBooking }) => {
       [name]: value
     }));
   };
-  
-  // Handle date changes
-  const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end || (start ? addDays(start, 1) : null));
-  };
 
   // Handle reservation submission
   const handleSubmit = (e) => {
@@ -237,6 +216,18 @@ const MainFeature = ({ addNewBooking }) => {
     
     setErrors(newErrors);
     if (isValid && currentStep < totalSteps) goToStep(currentStep + 1);
+  };
+
+  // Handle date changes
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end || (start ? addDays(start, 1) : null));
+    setReservationData(prev => ({
+      ...prev,
+      checkInDate: start ? start.toISOString().split('T')[0] : '',
+      checkOutDate: end ? end.toISOString().split('T')[0] : (start ? addDays(start, 1).toISOString().split('T')[0] : '')
+    }));
   };
 
   // Icons
@@ -491,20 +482,11 @@ const MainFeature = ({ addNewBooking }) => {
                                         endDate={endDate}
                                         id="dateRange"
                                         onChange={(update) => {
-                                          setDateRange(update);
                                           // Directly update the reservation data when dates change
-                                          const [newStartDate, newEndDate] = update;
-                                          if (newStartDate) {
-                                            setReservationData(prev => ({
-                                              ...prev,
-                                              checkInDate: newStartDate.toISOString().split('T')[0],
-                                            }));
-                                          }
-                                          if (newEndDate) {
-                                            setReservationData(prev => ({
-                                              ...prev,
-                                              checkOutDate: newEndDate.toISOString().split('T')[0]
-                                            }));
+                                          handleDateChange(update);
+                                          // Find and close the date picker if both dates are selected
+                                          if (update[0] && update[1]) {
+                                            document.activeElement.blur();
                                           }
                                           setStartDate(newStartDate);
                                           setEndDate(newEndDate);
