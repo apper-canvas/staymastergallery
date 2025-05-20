@@ -3,10 +3,14 @@ import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import DatePicker from 'react-datepicker';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { toast } from 'react-toastify';
-import { FaBed, FaUsers, FaRegCalendarCheck, FaConciergeBell, FaWifi, 
+import { format, addDays } from 'date-fns';
+import { 
+         FaBed, 
+         FaUsers, 
+         FaRegCalendarCheck, 
+         FaConciergeBell, 
+         FaWifi, 
          FaSwimmingPool, FaParking, FaUtensils, FaSnowflake, 
          FaTv, FaLeaf, FaCheckCircle } from 'react-icons/fa';
 import { CgArrowLongRight } from 'react-icons/cg';
@@ -15,18 +19,17 @@ const MainFeature = ({ addNewBooking }) => {
   // Form state
   const [reservationData, setReservationData] = useState({
     guestName: '',
-  const CalendarIcon = getIcon('calendar');
-  
+    email: '',
     phone: '',
     roomType: 'standard',
     checkInDate: '',
     checkOutDate: '',
     adults: 1,
     children: 0,
-    specialRequests: ''
-  });
     specialRequests: '',
     roomNumber: ''
+  });
+  
   // Validation state
   
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -35,6 +38,9 @@ const MainFeature = ({ addNewBooking }) => {
   // Form validation
   // Multi-step form state
   const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState({});
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [formProgress, setFormProgress] = useState(25);
   const totalSteps = 4;
   
@@ -51,12 +57,6 @@ const MainFeature = ({ addNewBooking }) => {
   
   // Date selection state
   const [dateRange, setDateRange] = useState([null, null]);
-      newErrors.checkInDate = 'Please select check-in date';
-    }
-    
-    if (!reservationData.checkOutDate) {
-      newErrors.checkOutDate = 'Please select check-out date';
-    } else if (reservationData.checkInDate && reservationData.checkOutDate <= reservationData.checkInDate) {
   // Room Types with details and pricing
   const roomTypes = [
     { id: 'standard', name: 'Standard Room', rate: 99, available: 8, capacity: 2, bedType: 'Queen', image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=640&q=80', amenities: ['Free WiFi', 'TV', 'Air Conditioning'], color: 'blue' },
@@ -91,9 +91,8 @@ const MainFeature = ({ addNewBooking }) => {
   // Handle step navigation
   const goToStep = (step) => {
     setCurrentStep(step);
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    toast.success("Booking details updated!");
+    setFormProgress(step * 25);
+  };
 
   // Update reservation costs when dates or room type changes
   useEffect(() => {
@@ -117,7 +116,7 @@ const MainFeature = ({ addNewBooking }) => {
   // Update form data when date range changes
   useEffect(() => {
     if (startDate && endDate) {
-            <div>
+      setReservationData(prev => ({
         ...prev,
         checkInDate: startDate.toISOString().split('T')[0],
         checkOutDate: endDate.toISOString().split('T')[0]
@@ -129,7 +128,6 @@ const MainFeature = ({ addNewBooking }) => {
   useEffect(() => {
     setReservationData(prev => ({
       ...prev,
-                  required
       roomType: selectedRoomType
     }));
   }, [selectedRoomType]);
@@ -139,45 +137,41 @@ const MainFeature = ({ addNewBooking }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!reservationData.guestName.trim()) {
+    if (!reservationData.guestName || !reservationData.guestName.trim()) {
       newErrors.guestName = 'Guest name is required';
     }
+
+    if (!reservationData.checkInDate) {
+      newErrors.checkInDate = 'Please select check-in date';
+    }
     
-            <div>
-              <label className="label" htmlFor="dates">Check-in & Check-out</label>
-              <div className="relative bg-white dark:bg-surface-700 border border-surface-300 dark:border-surface-600 rounded-lg hover:border-primary dark:hover:border-primary-light focus-within:border-primary dark:focus-within:border-primary-light transition-colors duration-200">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <CalendarIcon className="h-5 w-5 text-surface-500 dark:text-surface-400" />
-                </div>
-                <DatePicker
-                  selected={reservationData.checkInDate}
-                  onChange={handleDateChange}
-                  startDate={reservationData.checkInDate}
-                  endDate={reservationData.checkOutDate}
-                  selectsRange
-                  monthsShown={2}
-                  minDate={new Date()}
-                  className="w-full py-2 pl-10 pr-3 bg-transparent outline-none placeholder-surface-500 text-surface-900 dark:text-white text-base cursor-pointer"
-                  placeholderText="Select check-in and check-out dates"
-                  dateFormat="MMM d, yyyy"
-                  open={datePickerOpen}
-                  onInputClick={() => setDatePickerOpen(true)}
-                  onClickOutside={() => setDatePickerOpen(false)}
-                />
+    if (!reservationData.checkOutDate) {
+      newErrors.checkOutDate = 'Please select check-out date';
+    } else if (reservationData.checkInDate && reservationData.checkOutDate <= reservationData.checkInDate) {
+      newErrors.checkOutDate = 'Check-out date must be after check-in date';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
-              {(errors.checkInDate || errors.checkOutDate) && (
-                <p className="text-red-500 text-xs mt-1">{errors.checkInDate || errors.checkOutDate}</p>
-    setErrors({});
-    
+  
+  // Handle input changes
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReservationData(prev => ({
       ...prev,
       [name]: value
     }));
   };
+  
+  // Handle date changes
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end || (start ? addDays(start, 1) : null));
+  };
 
   // Handle reservation submission
-                  id="roomNumber"
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -226,7 +220,6 @@ const MainFeature = ({ addNewBooking }) => {
   // Handle submission for multi-step form
   const handleStepSubmit = (e) => {
     e.preventDefault();
-        bookingData={reservationData}
     // Validate current step
     let isValid = true;
     const newErrors = {};
@@ -472,61 +465,63 @@ const MainFeature = ({ addNewBooking }) => {
                               <div className="mb-4">
                                 <label className="label" htmlFor="dateRange">Check-in & Check-out</label>
                                 <div className="relative">
-                                <div className="relative">
-                                  <div className="relative focus-within:ring-2 focus-within:ring-primary focus-within:border-primary rounded-lg overflow-hidden">
-                                    <div 
-                                      className="input pl-10 flex items-center cursor-pointer hover:border-primary"
-                                      onClick={() => {
-                                        // Find the date picker input and focus it to open the calendar
-                                        const datePickerEl = document.querySelector('.react-datepicker__input-container input');
-                                        if (datePickerEl) {
-                                          datePickerEl.focus();
+                                  <div className="relative">
+                                    <div className="relative focus-within:ring-2 focus-within:ring-primary focus-within:border-primary rounded-lg overflow-hidden">
+                                      <div 
+                                        className="input pl-10 flex items-center cursor-pointer hover:border-primary"
+                                        onClick={() => {
+                                          // Find the date picker input and focus it to open the calendar
+                                          const datePickerEl = document.querySelector('.react-datepicker__input-container input');
+                                          if (datePickerEl) {
+                                            datePickerEl.focus();
+                                          }
+                                        }}
+                                      >
+                                        {startDate && endDate ? (
+                                          <span className="text-surface-900 dark:text-white font-medium">
+                                            {format(startDate, 'MMM dd, yyyy')} - {format(endDate, 'MMM dd, yyyy')}
+                                          </span>
+                                        ) : (
+                                          <span className="text-surface-500">Select date range</span>
+                                        )}
+                                      </div>
+                                      <DatePicker
+                                        selectsRange={true}
+                                        startDate={startDate}
+                                        endDate={endDate}
+                                        id="dateRange"
+                                        onChange={(update) => {
+                                          setDateRange(update);
+                                          // Directly update the reservation data when dates change
+                                          const [newStartDate, newEndDate] = update;
+                                          if (newStartDate) {
+                                            setReservationData(prev => ({
+                                              ...prev,
+                                              checkInDate: newStartDate.toISOString().split('T')[0],
+                                            }));
+                                          }
+                                          if (newEndDate) {
+                                            setReservationData(prev => ({
+                                              ...prev,
+                                              checkOutDate: newEndDate.toISOString().split('T')[0]
+                                            }));
+                                          }
+                                          setStartDate(newStartDate);
+                                          setEndDate(newEndDate);
                                         }
-                                      }}
-                                    >
-                                      {startDate && endDate ? (
-                                        <span className="text-surface-900 dark:text-white font-medium">
-                                          {format(startDate, 'MMM dd, yyyy')} - {format(endDate, 'MMM dd, yyyy')}
-                                        </span>
-                                      ) : (
-                                        <span className="text-surface-500">Select date range</span>
-                                      )}
+                                        }
+                                        minDate={today}
+                                        monthsShown={window.innerWidth > 768 ? 2 : 1}
+                                        className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
+                                        placeholderText="Select check-in and check-out dates"
+                                        wrapperClassName="w-full"
+                                      />
                                     </div>
-                                    <DatePicker
-                                      selectsRange={true}
-                                      startDate={startDate}
-                                      endDate={endDate}
-                                      id="dateRange"
-                                      onChange={(update) => {
-                                        setDateRange(update);
-                                        // Directly update the reservation data when dates change
-                                        const [newStartDate, newEndDate] = update;
-                                        if (newStartDate) {
-                                          setReservationData(prev => ({
-                                            ...prev,
-                                            checkInDate: newStartDate.toISOString().split('T')[0],
-                                          }));
-                                        }
-                                        if (newEndDate) {
-                                          setReservationData(prev => ({
-                                            ...prev,
-                                            checkOutDate: newEndDate.toISOString().split('T')[0]
-                                          }));
-                                        }
-                                      }}
-                                      minDate={today}
-                                      monthsShown={window.innerWidth > 768 ? 2 : 1}
-                                      className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
-                                      placeholderText="Select check-in and check-out dates"
-                                      wrapperClassName="w-full"
-                                    />
+                                    <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
                                   </div>
-                                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
-                                  </div>
-                                 </div>
-                                {errors.dates && <p className="mt-1 text-sm text-red-500">{errors.dates}</p>}
-                              </div>
-                              
+                                  {errors.dates && <p className="mt-1 text-sm text-red-500">{errors.dates}</p>}
+                                </div>
+                              </div>                              
                               <div className="flex flex-col space-y-2 mb-4">
                                 <div className="flex justify-between items-center">
                                   <span className="text-surface-600 dark:text-surface-400">Check-in:</span>
