@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import GuestPortal from './pages/GuestPortal';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -39,6 +40,7 @@ function App() {
     { name: 'Bookings', path: '/bookings' },
     { name: 'Rooms', path: '/rooms' },
     { name: 'Guests', path: '/guests' },
+    { name: 'Guest Portal', path: '/guest-portal' },
   ];
 
   const MoonIcon = getIcon('moon');
@@ -141,6 +143,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
+            <Route path="/guest-portal/*" element={<GuestPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
