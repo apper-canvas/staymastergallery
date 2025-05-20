@@ -129,40 +129,11 @@ const MainFeature = ({ addNewBooking }) => {
     
     if (!reservationData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-                  <div 
-                    className="input pl-10 flex items-center cursor-pointer hover:border-primary"
-                    onClick={() => {
-                      // This helps ensure the DatePicker opens on click
-                      document.getElementById('date-picker-input').focus();
-                    }}
-                  >
-                    {formData.checkInDate && formData.checkOutDate ? (
-                      <span className="text-surface-900 dark:text-white font-medium">
-                        {format(formData.checkInDate, 'MMM dd, yyyy')} - {format(formData.checkOutDate, 'MMM dd, yyyy')}
-                      </span>
-                    ) : (
-                      <span className="text-surface-500">Select date range</span>
-                    )}
-                  </div>
-                  <div className="absolute top-0 left-0 z-10">
-                    <DatePicker
-                      id="date-picker-input"
-                      selected={formData.checkInDate}
-                      onChange={(dates) => {
-                        const [start, end] = dates;
-                        setFormData({
-                          ...formData,
-                          checkInDate: start,
-                          checkOutDate: end || (start ? addDays(start, 1) : null)
-                        });
-                      }}
-                      startDate={formData.checkInDate}
-                      endDate={formData.checkOutDate}
-                      minDate={new Date()}
-                      selectsRange
-                      className="opacity-0 absolute"
-                    />
-                  </div>
+    }
+    
+    return Object.keys(newErrors).length === 0;
+  };
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReservationData(prev => ({
@@ -467,6 +438,24 @@ const MainFeature = ({ addNewBooking }) => {
                                 <label className="label">Check-in & Check-out</label>
                                 <div className="relative">
                                   <div className="relative focus-within:ring-2 focus-within:ring-primary focus-within:border-primary rounded-lg overflow-hidden">
+                                    <div 
+                                      className="input pl-10 flex items-center cursor-pointer hover:border-primary"
+                                      onClick={() => {
+                                        // Find the date picker input and focus it to open the calendar
+                                        const datePickerEl = document.querySelector('.react-datepicker__input-container input');
+                                        if (datePickerEl) {
+                                          datePickerEl.focus();
+                                        }
+                                      }}
+                                    >
+                                      {startDate && endDate ? (
+                                        <span className="text-surface-900 dark:text-white font-medium">
+                                          {format(startDate, 'MMM dd, yyyy')} - {format(endDate, 'MMM dd, yyyy')}
+                                        </span>
+                                      ) : (
+                                        <span className="text-surface-500">Select date range</span>
+                                      )}
+                                    </div>
                                     <DatePicker
                                       selectsRange={true}
                                       startDate={startDate}
