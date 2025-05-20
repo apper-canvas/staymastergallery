@@ -811,21 +811,24 @@ const MainFeature = ({ addNewBooking }) => {
                           </div>
                         </div>
 
-                          <div className="flex justify-between mt-8">
-                            <button
-                              type="button"
-                              onClick={() => goToStep(2)}
-                              className="btn-outline py-2.5 px-6"
-                            >
-                              Back
-                            </button>
-                            <button
-                              type="submit"
-                              className="btn-primary py-2.5 px-6 group"
-                            >
-                              Continue to Preferences & Payment
-                              <CgArrowLongRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
+                        
+                        <div className="flex justify-between mt-8">
+                          <button
+                            type="button"
+                            onClick={() => goToStep(2)}
+                            className="btn-outline py-2.5 px-6"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="submit"
+                            className="btn-primary py-2.5 px-6 group"
+                          >
+                            Continue to Preferences & Payment
+                            <CgArrowLongRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </div>
+                      </motion.div>
                           </div>
                       </motion.div>
                     )}
