@@ -78,8 +78,8 @@ const Home = () => {
         
         setRoomsData(transformedRooms);
       } catch (error) {
-        console.error('Error loading rooms:', error);
-        toast.error('Failed to load rooms');
+        // Avoid direct console.error which can trigger Apper SDK issues
+        toast.error(`Failed to load rooms: ${error.message || 'Unknown error'}`);
       } finally {
         setIsLoading(prev => ({ ...prev, rooms: false }));
       }
@@ -101,8 +101,8 @@ const Home = () => {
         
         setRecentBookings(transformedBookings.slice(0, 10)); // Limit to 10 bookings
       } catch (error) {
-        console.error('Error loading bookings:', error);
-        toast.error('Failed to load bookings');
+        // Avoid direct console.error which can trigger Apper SDK issues
+        toast.error(`Failed to load bookings: ${error.message || 'Unknown error'}`);
       } finally {
         setIsLoading(prev => ({ ...prev, bookings: false }));
       }
@@ -129,8 +129,8 @@ const Home = () => {
           });
         }
       } catch (error) {
-        console.error('Error loading stats:', error);
-        toast.error('Failed to load hotel statistics');
+        // Avoid direct console.error which can trigger Apper SDK issues
+        toast.error(`Failed to load hotel statistics: ${error.message || 'Unknown error'}`);
       } finally {
         setIsLoading(prev => ({ ...prev, stats: false }));
       }
@@ -197,7 +197,7 @@ const Home = () => {
       // Show success message only after successful update
       toast.success(`Room ${room.number} status changed to ${newStatus}`);
     } catch (error) {
-      console.error('Error updating room status:', error);
+      // Use toast for error display instead of console.error
       toast.error('Failed to update room status');
     }
   }; 
@@ -267,8 +267,7 @@ const Home = () => {
             >
               Overview
             </button>
-            <button
-              onClick={() => setActiveTab('rooms')}
+                    >
               className={`pb-4 px-1 font-medium text-sm transition-colors border-b-2 ${
                 activeTab === 'rooms'
                   ? 'border-primary text-primary dark:border-primary-light dark:text-primary-light'
