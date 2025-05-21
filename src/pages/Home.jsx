@@ -335,12 +335,13 @@ const Home = () => {
                   <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     <HomeIcon className="h-6 w-6" />
                   </div>
+                  <div className="ml-4">
                     <p className="text-sm font-medium text-surface-500 dark:text-surface-400">Today's Departures</p>
                     <h4 className="text-2xl font-semibold text-surface-900 dark:text-white">{stats.todayDepartures}</h4>
                   </div>
                 </div>
               </motion.div>
-              </motion.div>
+
               <motion.div variants={itemVariants} className="card">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
@@ -425,7 +426,6 @@ const Home = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
               </div>
            </motion.div>
           )}
