@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
+import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from 'react-datepicker';
 import { 
          FaBed, 
@@ -140,8 +141,8 @@ const MainFeature = ({ addNewBooking }) => {
     if (startDate && endDate) {
       setReservationData(prev => ({
         ...prev,
-        checkInDate: startDate.toISOString().split('T')[0],
-        checkOutDate: endDate.toISOString().split('T')[0]
+        checkInDate: startDate.toISOString(),
+        checkOutDate: endDate.toISOString()
       }));
     }
   }, [startDate, endDate]);
@@ -313,8 +314,8 @@ const MainFeature = ({ addNewBooking }) => {
     setEndDate(end || (start ? addDays(start, 1) : null));
     setReservationData(prev => ({
       ...prev,
-      checkInDate: start ? start.toISOString().split('T')[0] : '',
-      checkOutDate: end ? end.toISOString().split('T')[0] : (start ? addDays(start, 1).toISOString().split('T')[0] : '')
+      checkInDate: start ? start.toISOString() : '',
+      checkOutDate: end ? end.toISOString() : (start ? addDays(start, 1).toISOString() : '')
     }));
   };
   // Format credit card number with spaces
@@ -571,7 +572,7 @@ const MainFeature = ({ addNewBooking }) => {
                                       >
                                         {startDate && endDate ? (
                                           <span className="text-surface-900 dark:text-white font-medium">
-                                            {format(startDate, 'MMM dd, yyyy')} - {format(endDate, 'MMM dd, yyyy')}
+                                            {format(startDate, 'MMM dd, yyyy h:mm a')} - {format(endDate, 'MMM dd, yyyy h:mm a')}
                                           </span>
                                         ) : (
                                           <span className="text-surface-500">Select date range</span>
@@ -590,10 +591,14 @@ const MainFeature = ({ addNewBooking }) => {
                                             document.activeElement.blur();
                                           }
                                         }}
+                                        showTimeSelect
+                                        timeFormat="h:mm aa"
+                                        timeIntervals={30}
+                                        dateFormat="MMMM d, yyyy h:mm aa"
                                         minDate={today}
                                         monthsShown={window.innerWidth > 768 ? 2 : 1}
                                         className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
-                                        placeholderText="Select check-in and check-out dates"
+                                        placeholderText="Select check-in and check-out dates/times"
                                         wrapperClassName="w-full"
                                       />
                                     </div>
@@ -606,13 +611,13 @@ const MainFeature = ({ addNewBooking }) => {
                                 <div className="flex justify-between items-center">
                                   <span className="text-surface-600 dark:text-surface-400">Check-in:</span>
                                   <span className="font-medium text-surface-900 dark:text-white">
-                                    {startDate ? startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '-'}
+                                    {startDate ? startDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-surface-600 dark:text-surface-400">Check-out:</span>
                                   <span className="font-medium text-surface-900 dark:text-white">
-                                    {endDate ? endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '-'}
+                                    {endDate ? endDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
                                   </span>
                                 </div>
                                 {startDate && endDate && (
@@ -1168,13 +1173,13 @@ const MainFeature = ({ addNewBooking }) => {
                                     <div className="flex justify-between">
                                       <span>Check-in:</span>
                                       <span className="font-medium">
-                                        {startDate ? startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '-'}
+                                        {startDate ? startDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
                                       </span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Check-out:</span>
                                       <span className="font-medium">
-                                        {endDate ? endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '-'}
+                                        {endDate ? endDate.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
                                       </span>
                                     </div>
                                     <div className="flex justify-between">
