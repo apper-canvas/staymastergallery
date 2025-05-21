@@ -563,11 +563,11 @@ const MainFeature = ({ addNewBooking }) => {
                                       <div 
                                         className="input pl-10 flex items-center cursor-pointer hover:border-primary"
                                         onClick={() => {
-                                          // Find the date picker input and focus it to open the calendar
-                                          const datePickerEl = document.querySelector('.react-datepicker__input-container input');
+                                          // Find and focus the date picker input to open the calendar
+                                          const datePickerEl = document.querySelector('.react-datepicker-wrapper input');
                                           if (datePickerEl) {
                                             datePickerEl.focus();
-                                          }
+                                          } 
                                         }}
                                       >
                                         {startDate && endDate ? (
