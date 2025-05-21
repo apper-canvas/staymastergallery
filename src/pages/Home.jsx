@@ -61,7 +61,7 @@ const Home = () => {
       try {
         // Load rooms
         setIsLoading(prev => ({ ...prev, rooms: true }));
-        const roomsResponse = await fetchRooms({}, 50, 0);
+        const roomsResponse = await fetchRooms({}) || [];
         
         // Transform data to match the format expected by the UI
         const transformedRooms = roomsResponse.map(room => ({
@@ -70,8 +70,8 @@ const Home = () => {
           type: room.roomType?.Name || 'Standard',
           status: room.status || 'available',
           guest: room.guest?.Name,
-          checkOut: room.checkOut,
-          lastCleaned: room.lastCleaned,
+          checkOut: room.checkOut ? room.checkOut.split('T')[0] : null,
+          lastCleaned: room.lastCleaned ? room.lastCleaned.split('T')[0] : null,
           cleaningStaff: room.cleaningStaff,
           issue: room.maintenanceIssue
         }));
@@ -87,19 +87,19 @@ const Home = () => {
       try {
         // Load bookings
         setIsLoading(prev => ({ ...prev, bookings: true }));
-        const bookingsResponse = await fetchReservations({}, 10, 0);
+        const bookingsResponse = await fetchReservations({}) || [];
         
         // Transform data to match the format expected by the UI
         const transformedBookings = bookingsResponse.map(booking => ({
           id: booking.Id,
           guest: booking.guest?.Name || 'Guest',
-          checkIn: booking.checkInDate,
-          checkOut: booking.checkOutDate,
+          checkIn: booking.checkInDate ? booking.checkInDate.split('T')[0] : '',
+          checkOut: booking.checkOutDate ? booking.checkOutDate.split('T')[0] : '',
           roomType: booking.roomType?.Name || 'Standard',
           status: booking.status || 'confirmed'
         }));
         
-        setRecentBookings(transformedBookings);
+        setRecentBookings(transformedBookings.slice(0, 10)); // Limit to 10 bookings
       } catch (error) {
         console.error('Error loading bookings:', error);
         toast.error('Failed to load bookings');
@@ -111,7 +111,13 @@ const Home = () => {
         // Load stats
         setIsLoading(prev => ({ ...prev, stats: true }));
         const statsResponse = await fetchLatestStats();
-        
+
+        // If no stats exist yet, create default stats
+        if (!statsResponse) {
+          toast.info('Creating initial hotel statistics');
+          await createHotelStats(mockStats);
+        }
+
         if (statsResponse) {
           setStats({
             occupancyRate: statsResponse.occupancyRate,
@@ -176,21 +182,31 @@ const Home = () => {
     );
     
     setRoomsData(updatedRooms);
-    
-    // Update in database
-    updateRoom(roomId, { status: newStatus })
-      .catch(error => toast.error('Failed to update room status'));
-    
-    const room = roomsData.find(r => r.id === roomId);
-    toast.success(`Room ${room.number} status changed to ${newStatus}`);
-  };
+
+    try {
+      // Find the room before updating for the success message
+      const room = roomsData.find(r => r.id === roomId);
+      
+      if (!room) {
+        throw new Error(`Room with ID ${roomId} not found`);
+      }
+      
+      // Update in database
+      await updateRoom(roomId, { status: newStatus });
+      
+      // Show success message only after successful update
+      toast.success(`Room ${room.number} status changed to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating room status:', error);
+      toast.error('Failed to update room status');
+    }
+  }; 
 
   const handleViewBookingDetails = (booking) => {
     // Set the selected booking and open the modal
     setSelectedBooking(booking);
     setIsBookingModalOpen(true);
   };
-
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -215,7 +231,7 @@ const Home = () => {
   return (
     <div className="py-6">
       <div className="container-custom">
-        <div className="mb-8">
+        <div className="mb-6">
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -237,8 +253,9 @@ const Home = () => {
         {/* Main Feature Component */}
         <MainFeature addNewBooking={addNewBooking} />
 
-        {/* Tabs */}
-        <div className="mb-6 mt-10 border-b border-surface-200 dark:border-surface-700">
+        {/* Tabs navigation */}
+        <div className="mb-4 mt-8 border-b border-surface-200 dark:border-surface-700">
+          <h2 className="text-xl font-semibold mb-4">Hotel Status</h2>
           <div className="flex overflow-x-auto scrollbar-hide space-x-6">
             <button
               onClick={() => setActiveTab('overview')}
@@ -275,12 +292,17 @@ const Home = () => {
 
         {/* Tab Content */}
         <div className="mt-6">
-          {activeTab === 'overview' && (
+          {/* Overview tab */}
+          {activeTab === 'overview' && isLoading.stats ? (
+            <div className="flex justify-center items-center min-h-40">
+              <p className="text-surface-600 dark:text-surface-400">Loading hotel statistics...</p>
+            </div>
+          ) : activeTab === 'overview' && (
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             >
               <motion.div variants={itemVariants} className="card">
                 <div className="flex items-center">
@@ -356,22 +378,27 @@ const Home = () => {
             </motion.div>
           )}
           
-          {activeTab === 'rooms' && (
+          {/* Rooms tab */}
+          {activeTab === 'rooms' && isLoading.rooms ? (
+            <div className="flex justify-center items-center min-h-40">
+              <p className="text-surface-600 dark:text-surface-400">Loading room data...</p>
+            </div>
+          ) : activeTab === 'rooms' && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               className="overflow-x-auto"
             >
-              <div className="card overflow-hidden">
-                  <h3 className="text-lg font-semibold text-surface-900 dark:text-white">Room Status</h3>
+              <div className="card overflow-hidden mb-4">
+                  <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-2">Room Status</h3>
                   <div className="flex space-x-2">
                     <span className="badge-green">Available</span>
                     <span className="badge-blue">Occupied</span>
                     <span className="badge-purple">Reserved</span>
                     <span className="badge-yellow">Cleaning</span>
                     <span className="badge-red">Maintenance</span>
-                  </div>
+                  </div><div className="mt-4"></div>
                 
                 <div className="min-w-full">
                   <table className="min-w-full divide-y divide-surface-200 dark:divide-surface-700">
@@ -386,7 +413,7 @@ const Home = () => {
                     </thead>
                     <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
                       {roomsData.map((room) => (
-                        <tr key={room.id}>
+                        <tr key={room.id || Math.random()}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">{room.number}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-700 dark:text-surface-300">{room.type}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -396,8 +423,8 @@ const Home = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-700 dark:text-surface-300">
                             {room.status === 'occupied' && `${room.guest} (Until ${room.checkOut})`}
-                            {room.status === 'available' && `Last cleaned: ${room.lastCleaned}`}
-                            {room.status === 'reserved' && `${room.guest} (From ${room.checkIn})`}
+                            {room.status === 'available' && (room.lastCleaned ? `Last cleaned: ${room.lastCleaned}` : 'Available')}
+                            {room.status === 'reserved' && (room.guest ? `${room.guest} (From ${room.checkIn})` : 'Reserved')}
                             {room.status === 'cleaning' && `Staff: ${room.cleaningStaff}`}
                             {room.status === 'maintenance' && room.issue}
                           </td>
@@ -429,13 +456,18 @@ const Home = () => {
               </div>
            </motion.div>
           )}
-
+          {/* Bookings tab */}
+          {activeTab === 'bookings' && isLoading.bookings ? (
+            <div className="flex justify-center items-center min-h-40">
+              <p className="text-surface-600 dark:text-surface-400">Loading booking data...</p>
+            </div>
+          ) : activeTab === 'bookings' && (
           {activeTab === 'bookings' && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-            >
+              <div className="card overflow-hidden">
               <div className="card">
                 <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">Recent Bookings</h3>
                 <div className="overflow-x-auto">
@@ -452,7 +484,7 @@ const Home = () => {
                     </thead>
                     <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
                       {recentBookings.map((booking) => (
-                        <tr key={booking.id}>
+                        <tr key={booking.id || Math.random()}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">{booking.guest}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-700 dark:text-surface-300">{booking.checkIn}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-700 dark:text-surface-300">{booking.checkOut}</td>
