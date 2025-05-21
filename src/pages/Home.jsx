@@ -335,13 +335,12 @@ const Home = () => {
                   <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     <HomeIcon className="h-6 w-6" />
                   </div>
-              initial={{ opacity: 0 }}
                     <p className="text-sm font-medium text-surface-500 dark:text-surface-400">Today's Departures</p>
                     <h4 className="text-2xl font-semibold text-surface-900 dark:text-white">{stats.todayDepartures}</h4>
                   </div>
                 </div>
               </motion.div>
-
+              </motion.div>
               <motion.div variants={itemVariants} className="card">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
@@ -355,8 +354,8 @@ const Home = () => {
               </motion.div>
             </motion.div>
           )}
-
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider">Status</th>
+          
+          {activeTab === 'rooms' && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -364,7 +363,6 @@ const Home = () => {
               className="overflow-x-auto"
             >
               <div className="card overflow-hidden">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">{room.number}</td>
                   <h3 className="text-lg font-semibold text-surface-900 dark:text-white">Room Status</h3>
                   <div className="flex space-x-2">
                     <span className="badge-green">Available</span>
@@ -373,7 +371,7 @@ const Home = () => {
                     <span className="badge-yellow">Cleaning</span>
                     <span className="badge-red">Maintenance</span>
                   </div>
-                </div>
+                
                 <div className="min-w-full">
                   <table className="min-w-full divide-y divide-surface-200 dark:divide-surface-700">
                     <thead className="bg-surface-50 dark:bg-surface-800">
@@ -428,7 +426,8 @@ const Home = () => {
                   </table>
                 </div>
               </div>
-            </motion.div>
+              </div>
+           </motion.div>
           )}
 
           {activeTab === 'bookings' && (
