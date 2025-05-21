@@ -176,7 +176,7 @@ const Home = () => {
     }
   };
   
-  const handleRoomStatusChange = (roomId, newStatus) => {
+  const handleRoomStatusChange = async (roomId, newStatus) => {
     const updatedRooms = roomsData.map(room => 
       room.id === roomId ? { ...room, status: newStatus } : room
     );
@@ -462,12 +462,10 @@ const Home = () => {
               <p className="text-surface-600 dark:text-surface-400">Loading booking data...</p>
             </div>
           ) : activeTab === 'bookings' && (
-          {activeTab === 'bookings' && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              <div className="card overflow-hidden">
+              transition={{ duration: 0.5 }}>
               <div className="card">
                 <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">Recent Bookings</h3>
                 <div className="overflow-x-auto">
