@@ -596,8 +596,6 @@ const MainFeature = ({ addNewBooking }) => {
                                         }}
                                         dateFormat="MMMM d, yyyy h:mm aa"
                                         timeFormat="h:mm aa"
-                                        timeIntervals={30}
-                                        dateFormat="MMMM d, yyyy h:mm aa"
                                         minDate={today}
                                         monthsShown={window.innerWidth > 768 ? 2 : 1}
                                         className="input py-3 pl-9 w-full font-medium text-surface-900 dark:text-white border-2 focus:border-primary"
