@@ -581,6 +581,9 @@ const MainFeature = ({ addNewBooking }) => {
                                       <DatePicker
                                         selectsRange={true}
                                         startDate={startDate}
+                                        showTimeSelect
+                                        timeFormat="h:mm aa"
+                                        timeIntervals={30}
                                         endDate={endDate}
                                         id="dateRange"
                                         onChange={(update) => {
@@ -591,7 +594,7 @@ const MainFeature = ({ addNewBooking }) => {
                                             document.activeElement.blur();
                                           }
                                         }}
-                                        showTimeSelect
+                                        dateFormat="MMMM d, yyyy h:mm aa"
                                         timeFormat="h:mm aa"
                                         timeIntervals={30}
                                         dateFormat="MMMM d, yyyy h:mm aa"
