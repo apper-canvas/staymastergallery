@@ -267,7 +267,8 @@ const Home = () => {
             >
               Overview
             </button>
-                    >
+            <button
+              onClick={() => setActiveTab('rooms')}
               className={`pb-4 px-1 font-medium text-sm transition-colors border-b-2 ${
                 activeTab === 'rooms'
                   ? 'border-primary text-primary dark:border-primary-light dark:text-primary-light'
