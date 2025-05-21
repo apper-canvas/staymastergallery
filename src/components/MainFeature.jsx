@@ -19,6 +19,7 @@ const MainFeature = ({ addNewBooking }) => {
   // Form state
   const [reservationData, setReservationData] = useState({
     guestName: '',
+    customerName: '',
     email: '',
     phone: '',
     address: '',
@@ -163,6 +164,10 @@ const MainFeature = ({ addNewBooking }) => {
     if (!reservationData.guestName || !reservationData.guestName.trim()) {
       newErrors.guestName = 'Guest name is required';
     }
+    
+    if (!reservationData.customerName || !reservationData.customerName.trim()) {
+      newErrors.customerName = 'Customer name is required';
+    }
 
     if (!reservationData.email || !reservationData.email.trim()) {
       newErrors.email = 'Email address is required';
@@ -249,6 +254,7 @@ const MainFeature = ({ addNewBooking }) => {
         // Reset form
         setReservationData({
           guestName: '',
+          customerName: '',
           email: '',
           phone: '',
           roomType: 'standard',
@@ -707,6 +713,23 @@ const MainFeature = ({ addNewBooking }) => {
                               </div>
                               
                               <div className="space-y-4">
+                                <div>
+                                  <label htmlFor="customerName" className="label">Customer Name</label>
+                                  <div className="relative">
+                                    <input
+                                      type="text"
+                                      id="customerName"
+                                      name="customerName"
+                                      value={reservationData.customerName}
+                                      onChange={handleInputChange}
+                                      className={`input pl-9 ${errors.customerName ? 'border-red-500 dark:border-red-400' : ''}`}
+                                      placeholder="Enter customer name"
+                                    />
+                                    <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-500" />
+                                  </div>
+                                  {errors.customerName && <p className="mt-1 text-sm text-red-500">{errors.customerName}</p>}
+                                </div>
+                                
                                 <div>
                                   <label htmlFor="guestName" className="label">Full Name</label>
                                   <div className="relative">
@@ -1219,6 +1242,10 @@ const MainFeature = ({ addNewBooking }) => {
                               <div>
                                 <h5 className="font-medium text-surface-700 dark:text-surface-300 mb-3">Guest Information</h5>
                                 <div className="space-y-2 text-surface-900 dark:text-white">
+                                  <div className="flex justify-between">
+                                    <span>Customer Name:</span>
+                                    <span className="font-medium">{reservationData.customerName}</span>
+                                  </div>
                                   <div className="flex justify-between">
                                     <span>Name:</span>
                                     <span className="font-medium">{reservationData.guestName}</span>
