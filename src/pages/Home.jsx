@@ -5,6 +5,10 @@ import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
 import { format } from 'date-fns';
 import BookingDetailsModal from '../components/BookingDetailsModal';
+import { fetchRooms, updateRoom } from '../services/roomService';
+import { fetchReservations } from '../services/reservationService';
+import { fetchLatestStats, createHotelStats } from '../services/hotelStatsService';
+
 
 // Mock data
 const mockRoomStatus = [
@@ -40,21 +44,101 @@ const mockRecentBookings = [
 
 const Home = () => {
   const [stats, setStats] = useState(mockStats);
-  const [roomsData, setRoomsData] = useState(mockRoomStatus);
+  const [roomsData, setRoomsData] = useState([]);
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [isLoading, setIsLoading] = useState({
+    rooms: true,
+    bookings: true,
+    stats: true
+  });
   
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  // Add a new booking to the recentBookings state
-  const addNewBooking = (booking) => {
-    // Create a new booking with an id and add it to the recentBookings
-    const newBooking = {
-      id: recentBookings.length + 1,
-      ...booking,
-      status: 'confirmed'
+  
+  // Load rooms, bookings and stats when component mounts
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load rooms
+        setIsLoading(prev => ({ ...prev, rooms: true }));
+        const roomsResponse = await fetchRooms({}, 50, 0);
+        
+        // Transform data to match the format expected by the UI
+        const transformedRooms = roomsResponse.map(room => ({
+          id: room.Id,
+          number: room.number,
+          type: room.roomType?.Name || 'Standard',
+          status: room.status || 'available',
+          guest: room.guest?.Name,
+          checkOut: room.checkOut,
+          lastCleaned: room.lastCleaned,
+          cleaningStaff: room.cleaningStaff,
+          issue: room.maintenanceIssue
+        }));
+        
+        setRoomsData(transformedRooms);
+      } catch (error) {
+        console.error('Error loading rooms:', error);
+        toast.error('Failed to load rooms');
+      } finally {
+        setIsLoading(prev => ({ ...prev, rooms: false }));
+      }
+      
+      try {
+        // Load bookings
+        setIsLoading(prev => ({ ...prev, bookings: true }));
+        const bookingsResponse = await fetchReservations({}, 10, 0);
+        
+        // Transform data to match the format expected by the UI
+        const transformedBookings = bookingsResponse.map(booking => ({
+          id: booking.Id,
+          guest: booking.guest?.Name || 'Guest',
+          checkIn: booking.checkInDate,
+          checkOut: booking.checkOutDate,
+          roomType: booking.roomType?.Name || 'Standard',
+          status: booking.status || 'confirmed'
+        }));
+        
+        setRecentBookings(transformedBookings);
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        toast.error('Failed to load bookings');
+      } finally {
+        setIsLoading(prev => ({ ...prev, bookings: false }));
+      }
+      
+      try {
+        // Load stats
+        setIsLoading(prev => ({ ...prev, stats: true }));
+        const statsResponse = await fetchLatestStats();
+        
+        if (statsResponse) {
+          setStats({
+            occupancyRate: statsResponse.occupancyRate,
+            availableRooms: statsResponse.availableRooms,
+            reservedRooms: statsResponse.reservedRooms,
+            todayArrivals: statsResponse.todayArrivals,
+            todayDepartures: statsResponse.todayDepartures,
+            pendingMaintenance: statsResponse.pendingMaintenance
+          });
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        toast.error('Failed to load hotel statistics');
+      } finally {
+        setIsLoading(prev => ({ ...prev, stats: false }));
+      }
     };
-    setRecentBookings(prevBookings => [newBooking, ...prevBookings]);
+    
+    loadData();
+  }, []);
+
+  // Add a new booking
+  const addNewBooking = (booking) => {
+    // This would need to be implemented with the actual service
+    toast.info('Booking creation would be implemented with the actual reservation service');
   };
-  const [recentBookings, setRecentBookings] = useState(mockRecentBookings);
+
   const [activeTab, setActiveTab] = useState('overview');
   
   // Icons
@@ -92,6 +176,10 @@ const Home = () => {
     );
     
     setRoomsData(updatedRooms);
+    
+    // Update in database
+    updateRoom(roomId, { status: newStatus })
+      .catch(error => toast.error('Failed to update room status'));
     
     const room = roomsData.find(r => r.id === roomId);
     toast.success(`Room ${room.number} status changed to ${newStatus}`);
@@ -247,7 +335,7 @@ const Home = () => {
                   <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     <HomeIcon className="h-6 w-6" />
                   </div>
-                  <div className="ml-4">
+              initial={{ opacity: 0 }}
                     <p className="text-sm font-medium text-surface-500 dark:text-surface-400">Today's Departures</p>
                     <h4 className="text-2xl font-semibold text-surface-900 dark:text-white">{stats.todayDepartures}</h4>
                   </div>
@@ -268,7 +356,7 @@ const Home = () => {
             </motion.div>
           )}
 
-          {activeTab === 'rooms' && (
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider">Status</th>
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -276,7 +364,7 @@ const Home = () => {
               className="overflow-x-auto"
             >
               <div className="card overflow-hidden">
-                <div className="flex justify-between items-center mb-4">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">{room.number}</td>
                   <h3 className="text-lg font-semibold text-surface-900 dark:text-white">Room Status</h3>
                   <div className="flex space-x-2">
                     <span className="badge-green">Available</span>

@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import ReservationCard from '../components/ReservationCard';
 import BookingDetailsModal from '../components/BookingDetailsModal';
-import useReservations from '../hooks/useReservations';
 import useAuth from '../hooks/useAuth';
+import { fetchReservations } from '../services/reservationService';
+import { toast } from 'react-toastify';
 
 const Bookings = () => {
   const { currentUser } = useAuth();
-  const guestId = currentUser?.id || 'guest-001'; // Fallback to demo user
-  const { reservations, isLoading, refreshReservations } = useReservations(guestId);
+  const [reservations, setReservations] = useState([]);
   
   // State for active tab
   const [activeFilter, setActiveFilter] = useState('all');
@@ -18,6 +18,25 @@ const Bookings = () => {
   // State for booking details modal
   const [selectedBooking, setSelectedBooking] = useState(null);
   
+  // Loading state
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Load all reservations
+  useEffect(() => {
+    const loadReservations = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchReservations({}, 100, 0);
+        setReservations(data);
+      } catch (error) {
+        console.error('Failed to load reservations:', error);
+        toast.error('Failed to load reservations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadReservations();
+  }, []);
   // Icons
   const CalendarIcon = getIcon('calendar');
   const PlusIcon = getIcon('plus');

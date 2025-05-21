@@ -6,15 +6,16 @@ import ReservationCard from '../components/ReservationCard';
 import CheckInOutModal from '../components/CheckInOutModal';
 import useAuth from '../hooks/useAuth';
 import useReservations from '../hooks/useReservations';
+import { fetchGuestById } from '../services/guestService';
 
 const GuestPortal = () => {
   const location = useLocation();
   const { isAuthenticated, currentUser, isLoading: authLoading } = useAuth();
-  const { 
-    reservations, 
-    isLoading: reservationsLoading, 
-    checkIn, 
-    checkOut 
+  const {
+    reservations,
+    isLoading: reservationsLoading,
+    checkIn,
+    checkOut
   } = useReservations(currentUser?.id);
 
   // State for modals
@@ -23,6 +24,19 @@ const GuestPortal = () => {
     mode: null, // 'check-in' or 'check-out'
     reservation: null
   });
+  
+  // Fetch guest details if needed
+  const [guestDetails, setGuestDetails] = useState(null);
+  
+  useEffect(() => {
+    if (currentUser?.id) {
+      fetchGuestById(currentUser.id)
+        .then(guest => {
+          if (guest) setGuestDetails(guest);
+        })
+        .catch(error => console.error('Error fetching guest details:', error));
+    }
+  }, [currentUser?.id]);
 
   // Icons
   const CalendarIcon = getIcon('calendar');
@@ -106,7 +120,7 @@ const GuestPortal = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-surface-600 dark:text-surface-400 mt-2"
           >
-            Welcome, {currentUser?.name}. Manage your reservations and hotel experience.
+            Welcome, {currentUser?.firstName || currentUser?.name || guestDetails?.Name || 'Guest'}. Manage your reservations and hotel experience.
           </motion.p>
         </div>
 

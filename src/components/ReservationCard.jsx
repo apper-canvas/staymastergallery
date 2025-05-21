@@ -17,7 +17,7 @@ const ReservationCard = ({ reservation, onCheckIn, onCheckOut }) => {
   const CheckOutIcon = getIcon('log-out');
 
   // Helper to format dates
-  const formatDate = (dateString) => {
+  const formatDate = (dateString = '') => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
@@ -104,10 +104,10 @@ const ReservationCard = ({ reservation, onCheckIn, onCheckOut }) => {
         <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-surface-700 dark:text-surface-300 flex items-center">
-              <UsersIcon className="h-4 w-4 mr-2" /> Guests: <span className="font-medium ml-1">{reservation.guests}</span>
+              <UsersIcon className="h-4 w-4 mr-2" /> Guests: <span className="font-medium ml-1">{reservation.guestCount || 1}</span>
             </p>
             <p className="text-sm text-surface-700 dark:text-surface-300 mt-2 flex items-center">
-              <BedIcon className="h-4 w-4 mr-2" /> Room Type: <span className="font-medium ml-1">{reservation.roomType}</span>
+              <BedIcon className="h-4 w-4 mr-2" /> Room Type: <span className="font-medium ml-1">{reservation.roomType?.Name || 'Standard'}</span>
             </p>
             <p className="text-sm text-surface-700 dark:text-surface-300 mt-2 flex items-center">
               <DollarSignIcon className="h-4 w-4 mr-2" /> Total: <span className="font-medium ml-1">${reservation.totalAmount}</span>
@@ -115,7 +115,7 @@ const ReservationCard = ({ reservation, onCheckIn, onCheckOut }) => {
           </div>
           <div>
             <p className="text-sm text-surface-700 dark:text-surface-300 flex items-center">
-              <ClockIcon className="h-4 w-4 mr-2" /> Booked on: <span className="font-medium ml-1">{formatDate(reservation.createdAt)}</span>
+              <ClockIcon className="h-4 w-4 mr-2" /> Booked on: <span className="font-medium ml-1">{formatDate(reservation.CreatedOn)}</span>
             </p>
             {reservation.checkInTime && (
               <p className="text-sm text-surface-700 dark:text-surface-300 mt-2 flex items-center">
